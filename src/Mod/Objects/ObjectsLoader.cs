@@ -95,7 +95,7 @@ public static class ObjectsLoader
             var aabbCenter = aabb.Position + aabb.Size / 2;
             var boxCenter = aabb.Size / 2;
 
-            collisionShape.Position = aabbCenter - boxCenter;
+            collisionShape.Position = aabbCenter;
         }
         else
         {
@@ -231,11 +231,13 @@ public static class ObjectsLoader
         return vehicleObject;
     }
 
-    private static Aabb  GetAabb(Node3D visualInstance)
+    private static Aabb GetAabb(Node3D visualInstance)
     {
         if (visualInstance is MeshInstance3D { Mesh: not null } meshInstance)
         {
-            return meshInstance.Mesh.GetAabb();
+            var aabb = meshInstance.Mesh.GetAabb();
+            aabb.Size *= meshInstance.Scale;
+            return aabb;
         }
         
         Aabb combinedAabb = new Aabb();
@@ -247,7 +249,10 @@ public static class ObjectsLoader
                 continue;
                 
             Aabb childAabb = childMeshInstance.Mesh.GetAabb();
+            childAabb.Position *= childMeshInstance.Scale;
             childAabb.Position += childMeshInstance.Position;
+            childAabb.Size *= childMeshInstance.Scale;
+            
             if (first)
             {
                 combinedAabb = childAabb;

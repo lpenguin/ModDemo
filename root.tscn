@@ -1,9 +1,9 @@
 [gd_scene load_steps=6 format=3 uid="uid://ciljcdv4m8j5d"]
 
-[ext_resource type="Script" path="res://src/Nodes/ModLoader.cs" id="1_ejjg3"]
+[ext_resource type="Script" uid="uid://dc4v31l7prkby" path="res://src/Nodes/ModLoader.cs" id="1_ejjg3"]
 [ext_resource type="PackedScene" uid="uid://h5iu7t5bvbhw" path="res://level_selector.tscn" id="2_5tjhw"]
-[ext_resource type="Script" path="res://src/Nodes/LevelSelector.cs" id="3_jqt42"]
-[ext_resource type="Script" path="res://src/Nodes/CameraControls.cs" id="4_20vnv"]
+[ext_resource type="Script" uid="uid://b70cwe2qqy5km" path="res://src/Nodes/LevelSelector.cs" id="3_jqt42"]
+[ext_resource type="Script" uid="uid://cxwt33vwksrc0" path="res://src/Nodes/CameraControls.cs" id="4_20vnv"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_o3drw"]
 size = Vector3(2.61443, 2.38083, 5.14368)
@@ -19,12 +19,13 @@ script = ExtResource("3_jqt42")
 modLoaderNodePath = NodePath("../Mod Loader")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.773508, 0.633786, 0, -0.633786, 0.773508, 0, 2.05532, 3.06152)
+transform = Transform3D(1, 0, 0, 0, 0.725747, 0.687962, 0, -0.687962, 0.725747, 0, 5.00649, 5.13869)
 script = ExtResource("4_20vnv")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.435718, 0.900083, 0, -0.900083, 0.435718, 0, 2.49164, 0)
 light_energy = 1.97
+shadow_enabled = true
 
 [node name="VehicleBody3D" type="VehicleBody3D" parent="."]
 
