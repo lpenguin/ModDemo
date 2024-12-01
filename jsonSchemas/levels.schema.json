@@ -1,0 +1,69 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "name", "objects"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the level"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the level"
+    },
+    "objects": {
+      "type": "array",
+      "description": "List of object instances in the level",
+      "items": {
+        "type": "object",
+        "required": ["objectId", "transform"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Optional unique identifier for this instance"
+          },
+          "objectId": {
+            "type": "string",
+            "description": "Reference to an object defined in objects.json"
+          },
+          "transform": { "$ref": "#/$defs/transform"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "vector3": {
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
+    },
+    "transform": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "$ref": "#/$defs/vector3"
+        },
+        "scale": {
+          "$ref": "#/$defs/vector3"
+        },
+        "rotation": {
+          "$ref": "#/$defs/vector3"
+        }
+      }
+    }
+  }
+}

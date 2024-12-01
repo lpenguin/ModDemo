@@ -1,0 +1,55 @@
+{
+  "id": "level1",
+  "name": "Level1",
+  "objects": [{
+	"id": "ground",
+	"objectId": "ground",
+	"transform": {
+	  "position": {
+		"x": 0,
+		"y": 0,
+		"z": 0
+	  },
+	  "scale": {
+		"x": 1,
+		"y": 1,
+		"z": 1
+	  }
+	}
+  }, {
+	"id": "mushroom1",
+	"objectId": "mushroom",
+	"transform": {
+	  "position": {
+		"x": 10,
+		"y": 0,
+		"z": 0
+	  }
+	}
+  }, {
+	"id": "cube1",
+	"objectId": "cube",
+	"transform": {
+	  "position": {
+		"x": 0,
+		"y": 10,
+		"z": 0
+	  },
+	  "rotation": {
+		"x": 10,
+		"y": 0,
+		"z": 0
+	  }
+	}
+  }, {
+	"id": "om1",
+	"objectId": "oxidized_monk",
+	"transform": {
+		"position": {
+			"x": 0,
+			"y": 2,
+			"z": 0
+		}
+	}
+}]
+}

@@ -1,0 +1,33 @@
+<Project Sdk="Godot.NET.Sdk/4.3.0">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net7.0</TargetFramework>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'ios' ">net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="jsonSchemas\levels.schema.json" />
+    <Content Include="jsonSchemas\objects.schema.json" />
+    <Content Include="rootMod\levels\level1.json" />
+    <Content Include="rootMod\objects.json" />
+    <Content Include="rootMod\objects\cube\cube.mtl" />
+    <Content Include="rootMod\objects\cube\cube.obj" />
+    <Content Include="rootMod\objects\cube\cube.obj.import" />
+    <Content Include="rootMod\objects\ground\ground.mtl" />
+    <Content Include="rootMod\objects\ground\ground.obj" />
+    <Content Include="rootMod\objects\ground\ground.obj.import" />
+    <Content Include="rootMod\objects\ground\ground.png" />
+    <Content Include="rootMod\objects\ground\ground.png.import" />
+    <Content Include="rootMod\objects\mushroom\mushroom.mtl" />
+    <Content Include="rootMod\objects\mushroom\mushroom.obj" />
+    <Content Include="rootMod\objects\mushroom\mushroom.obj.import" />
+    <Content Include="rootMod\objects\oxidizedMonk\body.fbx" />
+    <Content Include="rootMod\objects\oxidizedMonk\body.fbx.import" />
+    <Content Include="rootMod\objects\oxidizedMonk\wheel.fbx" />
+    <Content Include="rootMod\objects\oxidizedMonk\wheel.fbx.import" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,169 @@
+{
+	"objects": [
+		{
+			"id": "ground",
+			"type": "prop",
+			"mesh": {
+				"render": {
+					"mesh": "ground/ground.obj",
+					"texture": "ground/ground.png"
+				}
+			},
+			"physics": {
+				"type": "static",
+				"collider": {
+					"type": "box"
+				}
+			}
+		},
+		{
+			"id": "cube",
+			"type": "prop",
+			"mesh": {
+				"render": {
+					"mesh": "cube/cube.obj"
+				},
+				"transform": {}
+			},
+			"physics": {
+				"type": "rigid_body",
+				"collider": {
+					"type": "box"
+				}
+			}
+		},
+		{
+			"id": "mushroom",
+			"type": "prop",
+			"mesh": {
+				"render": {
+					"mesh": "mushroom/mushroom.obj"
+				},
+				"transform": {
+					"scale": {
+						"x": 10,
+						"y": 10,
+						"z": 10
+					}
+				}
+			},
+			"physics": {
+				"type": "static",
+				"collider": {
+					"type": "box"
+				}
+			}
+		},
+		{
+			"id": "oxidized_monk",
+			"type": "vehicle",
+			"physics": {
+				"type": "rigid_body",
+				"collider": {
+					"type": "box"
+				},
+				"mass": 1500
+			},
+			"vehicle": {
+				"engine_force": 500,
+				"brake_force": 10,
+				"steering_angle": 0.5
+			},
+			"mesh": {
+				"render": {
+					"mesh": "oxidizedMonk/body.fbx"
+				}
+			},
+			"wheels": [
+				{
+					"id": "front_right",
+					"transform": {
+						"position": {
+							"x": 0.451,
+							"y": -0.649,
+							"z": -1.305
+						},
+						"rotation": {
+							"x": 0,
+							"y": 0,
+							"z": 0
+						}
+					},
+					"use_as_traction": true,
+					"use_as_steering": true,
+					"mesh": {
+						"render": {
+							"mesh": "oxidizedMonk/wheel.fbx"
+						}
+					}
+				},
+				{
+					"id": "front_left",
+					"transform": {
+						"position": {
+							"x": -0.849,
+							"y": -0.657,
+							"z": -1.3
+						},
+						"rotation": {
+							"x": 0,
+							"y": 0,
+							"z": 0
+						}
+					},
+					"use_as_traction": true,
+					"use_as_steering": true,
+					"mesh": {
+						"render": {
+							"mesh": "oxidizedMonk/wheel.fbx"
+						}
+					}
+				},
+				{
+					"id": "rear_right",
+					"transform": {
+						"position": {
+							"x": 0.619,
+							"y": -0.659,
+							"z": 1.289
+						},
+						"rotation": {
+							"x": 0,
+							"y": 0,
+							"z": 0
+						}
+					},
+					"use_as_traction": true,
+					"use_as_steering": false,
+					"mesh": {
+						"render": {
+							"mesh": "oxidizedMonk/wheel.fbx"
+						}
+					}
+				},
+				{
+					"id": "rear_left",
+					"transform": {
+						"position": {
+							"x": -1.018,
+							"y": -0.65,
+							"z": 1.287
+						},
+						"rotation": {
+							"x": 0,
+							"y": 0,
+							"z": 0
+						}
+					},
+					"use_as_traction": true,
+					"use_as_steering": false,
+					"mesh": {
+						"render": {
+							"mesh": "oxidizedMonk/wheel.fbx"
+						}
+					}
+				}
+			]
+		}
+	]
+}

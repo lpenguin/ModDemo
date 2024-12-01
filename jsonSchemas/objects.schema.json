@@ -1,0 +1,187 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["objects"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Path to the JSON schema file"
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the object"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["prop", "vehicle"],
+            "description": "Type of the object"
+          }
+        },
+        "if": {
+          "properties": { "type": { "const": "prop" } }
+        },
+        "then": { "$ref": "#/$defs/propObject" },
+        "else": { "$ref": "#/$defs/vehicleObject" }
+      }
+    }
+  },
+  "$defs": {
+    "vector3": {
+      "type": "object",
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" }
+      }
+    },
+    "transform": {
+      "type": "object",
+      "properties": {
+        "position": { "$ref": "#/$defs/vector3" },
+        "scale": { "$ref": "#/$defs/vector3" },
+        "rotation": { "$ref": "#/$defs/vector3" }
+      }
+    },
+    "render": {
+      "type": "object",
+      "required": ["mesh"],
+      "properties": {
+        "mesh": {
+          "type": "string",
+          "description": "Path to the mesh file"
+        },
+        "texture": {
+          "type": "string",
+          "description": "Path to the texture file"
+        }
+      }
+    },
+    "collider": {
+      "type": "object",
+      "required": ["type", "transform"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["box", "mesh"],
+          "description": "Type of collider"
+        },
+        "transform": { "$ref": "#/$defs/transform" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "box" } }
+          },
+          "then": {
+            "required": ["size"],
+            "properties": {
+              "size": { "$ref": "#/$defs/vector3" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "mesh" } }
+          },
+          "then": {
+            "required": ["mesh"],
+            "properties": {
+              "mesh": {
+                "type": "string",
+                "description": "Path to the collision mesh file"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "physics": {
+      "type": "object",
+      "required": ["type", "collider"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of physics behavior",
+          "enum": ["static", "rigid_body"]
+        },
+        "collider": { "$ref": "#/$defs/collider" },
+        "mass": {
+          "type": "number",
+          "description": "Mass of the object"
+        }
+      }
+    },
+    "wheel": {
+      "type": "object",
+      "required": ["id", "transform", "use_as_traction", "use_as_steering", "mesh"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "transform": { "$ref": "#/$defs/transform" },
+        "use_as_traction": {
+          "type": "boolean",
+          "description": "Whether the wheel is used for traction"
+        },
+        "use_as_steering": {
+          "type": "boolean",
+          "description": "Whether the wheel is used for steering"
+        },
+        "mesh": { "$ref": "#/$defs/meshProperties" }
+      }
+    },
+    "meshProperties": {
+      "type": "object",
+      "required": ["render"],
+      "properties": {
+        "render": { "$ref": "#/$defs/render" },
+        "transform": { "$ref": "#/$defs/transform" }
+      }
+    },
+    "propObject": {
+      "type": "object",
+      "required": ["mesh"],
+      "properties": {
+        "mesh": { "$ref": "#/$defs/meshProperties" },
+        "physics": { "$ref": "#/$defs/physics" }
+      }
+    },
+    "vehicleObject": {
+      "type": "object",
+      "required": ["physics", "vehicle", "mesh", "wheels"],
+      "properties": {
+        "physics": { "$ref": "#/$defs/physics" },
+        "vehicle": {
+          "type": "object",
+          "required": ["engine_force", "brake_force", "steering_angle"],
+          "properties": {
+            "engine_force": {
+              "type": "number",
+              "description": "Engine force of the vehicle"
+            },
+            "brake_force": {
+              "type": "number",
+              "description": "Brake force of the vehicle"
+            },
+            "steering_angle": {
+              "type": "number",
+              "description": "Steering angle of the vehicle"
+            }
+          }
+        },
+        "mesh": { "$ref": "#/$defs/meshProperties" },
+        "wheels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/wheel" }
+        }
+      }
+    }
+  }
+}
