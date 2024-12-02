@@ -48,6 +48,7 @@ public static class LevelLoader
 
                     if (instance is VehicleObject vehicleObject && levelObj.Tags.Contains("player"))
                     {
+                        vehicleObject.AddToGroup("vehicles");
                         vehicleObject.ControlledByPlayer = true;
                     }
                     // Add to level

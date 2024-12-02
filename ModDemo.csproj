@@ -27,7 +27,4 @@
     <Content Include="rootMod\objects\oxidizedMonk\wheel.fbx" />
     <Content Include="rootMod\objects\oxidizedMonk\wheel.fbx.import" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="src\" />
-  </ItemGroup>
 </Project>

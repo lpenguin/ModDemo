@@ -1,4 +1,5 @@
 ﻿using Godot;
+using ModDemo.Core;
 
 namespace ModDemo.Mod.Objects;
 
@@ -19,6 +20,17 @@ public partial class VehicleObject : VehicleBody3D
     private const float VELOCITY_THRESHOLD = 0.5f;
     private GearState currentGear = GearState.Forward;
     private float currentSteering = 0.0f;
+
+    public override void _Ready()
+    {
+        base._Ready();
+        // Add to vehicles group for camera to find
+        AddToGroup("vehicles");
+        if (ControlledByPlayer)
+        {
+            SignalBus.DispatchSignal("VehiclePossessed", this);
+        }
+    }
 
     public override void _PhysicsProcess(double delta)
     {

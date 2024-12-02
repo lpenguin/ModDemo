@@ -52,6 +52,7 @@ public partial class LevelSelector : Control
         {
             Node3D levelInstance = _modLoader.InstantiateLevel(_selectedLevel);
             GetTree().CurrentScene.AddChild(levelInstance);
+            Input.MouseMode = Input.MouseModeEnum.Captured;
             // Add the levelInstance to the scene tree or handle it as needed
             GD.Print($"Level loaded: {_selectedLevel}");
         }
