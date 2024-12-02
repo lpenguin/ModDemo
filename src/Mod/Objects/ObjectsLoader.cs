@@ -232,7 +232,7 @@ public static class ObjectsLoader
 
     private static Node3D ReadScene(SceneObject objectDef, string modDirectory)
     {
-        string scenePath = GodotPath.Combine(modDirectory, objectDef.File);
+        string scenePath = GodotPath.Combine(modDirectory, "objects", objectDef.File);
         var scene = ResourceLoader.Load<PackedScene>(scenePath);
         if (scene == null)
         {
