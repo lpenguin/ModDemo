@@ -1,9 +1,12 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ModDemo.Json.Objects;
-
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum ObjectType
+namespace ModDemo.Json.Objects
 {
-    Prop, Vehicle
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum ObjectType
+    {
+        Prop,
+        Vehicle,
+        Scene
+    }
 }

@@ -19,7 +19,7 @@
           },
           "type": {
             "type": "string",
-            "enum": ["prop", "vehicle"],
+            "enum": ["prop", "vehicle", "scene"],
             "description": "Type of the object"
           }
         },
@@ -27,7 +27,13 @@
           "properties": { "type": { "const": "prop" } }
         },
         "then": { "$ref": "#/$defs/propObject" },
-        "else": { "$ref": "#/$defs/vehicleObject" }
+        "else": {
+          "if": {
+            "properties": { "type": { "const": "vehicle" } }
+          },
+          "then": { "$ref": "#/$defs/vehicleObject" },
+          "else": { "$ref": "#/$defs/sceneObject" }
+        }
       }
     }
   },
@@ -180,6 +186,16 @@
         "wheels": {
           "type": "array",
           "items": { "$ref": "#/$defs/wheel" }
+        }
+      }
+    },
+    "sceneObject": {
+      "type": "object",
+      "required": ["file"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Path to the scene file"
         }
       }
     }

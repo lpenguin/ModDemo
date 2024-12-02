@@ -24,6 +24,7 @@ public static class ObjectsLoader
             {
                 ModDemo.Json.Objects.PropObject propObject => ReadProp(propObject, modDirectory),
                 ModDemo.Json.Objects.VehicleObject vehicleObject => ReadVehicle(vehicleObject, modDirectory),
+                ModDemo.Json.Objects.SceneObject sceneObject => ReadScene(sceneObject, modDirectory),
                 _ => throw new NotImplementedException()
             };
 
@@ -229,6 +230,17 @@ public static class ObjectsLoader
         }
 
         return vehicleObject;
+    }
+
+    private static Node3D ReadScene(SceneObject objectDef, string modDirectory)
+    {
+        string scenePath = GodotPath.Combine(modDirectory, objectDef.File);
+        var scene = ResourceLoader.Load<PackedScene>(scenePath);
+        if (scene == null)
+        {
+            throw new FileNotFoundException($"Scene not found: {scenePath}");
+        }
+        return scene.Instantiate<Node3D>();
     }
 
     private static Aabb GetAabb(Node3D visualInstance)
