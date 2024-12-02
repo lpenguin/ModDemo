@@ -1,0 +1,61 @@
+[gd_scene load_steps=6 format=3 uid="uid://c01vssn4uuc6y"]
+
+[ext_resource type="Script" path="res://src/Mod/Objects/VehicleObject.cs" id="1_0hn1t"]
+[ext_resource type="PackedScene" uid="uid://ch6iu3vm2861g" path="res://rootMod/objects/oxidizedMonk/body.fbx" id="2_ilrxr"]
+[ext_resource type="PackedScene" uid="uid://dbsb3u7hcla3u" path="res://rootMod/objects/oxidizedMonk/wheel.fbx" id="3_i2j3a"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_66ie6"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_itqek"]
+size = Vector3(1, 0.703003, 1.9931)
+
+[node name="VehicleBody3D" type="VehicleBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.49461, 1.49133, 0.821733)
+physics_material_override = SubResource("PhysicsMaterial_66ie6")
+script = ExtResource("1_0hn1t")
+MaxBrakeForce = 0.5
+MaxSteeringAngle = 0.5
+MaxEngineForce = 50.0
+
+[node name="body" parent="." instance=ExtResource("2_ilrxr")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0297241, 0.00234985)
+shape = SubResource("BoxShape3D_itqek")
+
+[node name="VehicleWheel3D" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.557982, -0.47783, 1.10114)
+use_as_steering = true
+wheel_radius = 0.895
+suspension_travel = 0.5
+suspension_stiffness = 30.0
+
+[node name="wheel" parent="VehicleWheel3D" instance=ExtResource("3_i2j3a")]
+
+[node name="VehicleWheel3D2" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.558, -0.477566, 1.101)
+use_as_steering = true
+wheel_radius = 0.895
+suspension_travel = 0.5
+suspension_stiffness = 30.0
+
+[node name="wheel" parent="VehicleWheel3D2" instance=ExtResource("3_i2j3a")]
+
+[node name="VehicleWheel3D3" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.800272, -0.47783, -1.52487)
+use_as_traction = true
+wheel_radius = 0.895
+suspension_travel = 0.5
+suspension_stiffness = 30.0
+
+[node name="wheel" parent="VehicleWheel3D3" instance=ExtResource("3_i2j3a")]
+
+[node name="VehicleWheel3D4" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, -0.477566, -1.525)
+use_as_traction = true
+wheel_radius = 0.895
+suspension_travel = 0.5
+suspension_stiffness = 30.0
+
+[node name="wheel" parent="VehicleWheel3D4" instance=ExtResource("3_i2j3a")]

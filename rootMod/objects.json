@@ -56,6 +56,11 @@
 		},
 		{
 			"id": "oxidized_monk",
+			"type": "scene",
+			"file": "oxidizedMonk/om1.tscn"
+		},
+		{
+			"id": "oxidized_monk_vehicle",
 			"type": "vehicle",
 			"physics": {
 				"type": "rigid_body",
