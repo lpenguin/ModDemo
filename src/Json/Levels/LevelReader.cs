@@ -72,7 +72,7 @@ public static class LevelReader
             }
 
             if (string.IsNullOrWhiteSpace(obj.ObjectId))
-                errors.Add($"ObjectId is required for level object{(string.IsNullOrWhiteSpace(obj.Id) ? "" : $" '{obj.Id}'")}");
+                errors.Add($"ObjectId is required for level object{(string.IsNullOrWhiteSpace(obj.Name) ? "" : $" '{obj.Name}'")}");
 
             if (obj.Transform == null)
             {

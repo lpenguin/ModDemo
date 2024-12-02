@@ -18,9 +18,9 @@
         "type": "object",
         "required": ["objectId", "transform"],
         "properties": {
-          "id": {
+          "name": {
             "type": "string",
-            "description": "Optional unique identifier for this instance"
+            "description": "Optional name for this instance"
           },
           "objectId": {
             "type": "string",

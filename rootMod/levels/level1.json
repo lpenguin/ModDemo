@@ -2,7 +2,7 @@
   "id": "level1",
   "name": "Level1",
   "objects": [{
-	"id": "ground",
+	"name": "ground",
 	"objectId": "ground",
 	"transform": {
 	  "position": {
@@ -17,7 +17,7 @@
 	  }
 	}
   }, {
-	"id": "mushroom1",
+	"name": "mushroom1",
 	"objectId": "mushroom",
 	"transform": {
 	  "position": {
@@ -27,7 +27,7 @@
 	  }
 	}
   }, {
-	"id": "cube1",
+	"name": "cube1",
 	"objectId": "cube",
 	"transform": {
 	  "position": {
@@ -42,13 +42,13 @@
 	  }
 	}
   }, {
-	"id": "om1",
+	"name": "om1",
 	"objectId": "oxidized_monk",
     "tags": ["player"],
 	"transform": {
 		"position": {
-			"x": 0,
-			"y": 2,
+			"x": -1,
+			"y": 3,
 			"z": 0
 		}
 	}
