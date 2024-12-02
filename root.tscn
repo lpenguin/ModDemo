@@ -1,9 +1,9 @@
 [gd_scene load_steps=6 format=3 uid="uid://ciljcdv4m8j5d"]
 
-[ext_resource type="Script" uid="uid://dc4v31l7prkby" path="res://src/Nodes/ModLoader.cs" id="1_ejjg3"]
+[ext_resource type="Script" path="res://src/Nodes/ModLoader.cs" id="1_ejjg3"]
 [ext_resource type="PackedScene" uid="uid://h5iu7t5bvbhw" path="res://level_selector.tscn" id="2_5tjhw"]
-[ext_resource type="Script" uid="uid://b70cwe2qqy5km" path="res://src/Nodes/LevelSelector.cs" id="3_jqt42"]
-[ext_resource type="Script" uid="uid://cxwt33vwksrc0" path="res://src/Nodes/CameraControls.cs" id="4_20vnv"]
+[ext_resource type="Script" path="res://src/Nodes/LevelSelector.cs" id="3_jqt42"]
+[ext_resource type="Script" path="res://src/Nodes/CameraControls.cs" id="4_20vnv"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_o3drw"]
 size = Vector3(2.61443, 2.38083, 5.14368)
