@@ -26,7 +26,14 @@
             "type": "string",
             "description": "Reference to an object defined in objects.json"
           },
-          "transform": { "$ref": "#/$defs/transform"}
+          "transform": { "$ref": "#/$defs/transform"},
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Tags associated with this instance",
+            }
+          }
         }
       }
     }

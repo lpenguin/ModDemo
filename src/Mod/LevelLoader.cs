@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Godot;
 using ModDemo.Json.Common.Extensions;
 using ModDemo.Json.Levels;
@@ -42,9 +43,13 @@ public static class LevelLoader
                     // Create a new instance
                     var instance = (Node3D)objectNode.Duplicate();
                     
-                    instance.Name = levelObj.Id;
+                    instance.Name = levelObj.Name;
                     instance.Transform = levelObj.Transform.ToGodot();
 
+                    if (instance is VehicleObject vehicleObject && levelObj.Tags.Contains("player"))
+                    {
+                        vehicleObject.ControlledByPlayer = true;
+                    }
                     // Add to level
                     levelNode.AddChild(instance);
                 }

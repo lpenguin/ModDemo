@@ -44,6 +44,7 @@
   }, {
 	"id": "om1",
 	"objectId": "oxidized_monk",
+    "tags": ["player"],
 	"transform": {
 		"position": {
 			"x": 0,
