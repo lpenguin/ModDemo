@@ -93,10 +93,8 @@ public static class ObjectsLoader
         {
             // Calculate position based on AABB and box size
             // AABB center + offset to match the box collider's center with the mesh's center
-            var aabbCenter = aabb.Position + aabb.Size / 2;
-            var boxCenter = aabb.Size / 2;
 
-            collisionShape.Position = aabbCenter;
+            collisionShape.Position = aabb.Position + aabb.Size / 2;
         }
         else
         {
@@ -198,8 +196,8 @@ public static class ObjectsLoader
         vehicleObject.AddChild(visualInstance);
         
         // Set up vehicle properties
-        vehicleObject.EngineForce = objectDef.Vehicle.EngineForce;
-        vehicleObject.BrakeForce = objectDef.Vehicle.BrakeForce;
+        vehicleObject.MaxEngineForce = objectDef.Vehicle.EngineForce;
+        vehicleObject.MaxBrakeForce = objectDef.Vehicle.BrakeForce;
         vehicleObject.MaxSteeringAngle = objectDef.Vehicle.SteeringAngle;
 
         CollisionShape3D collisionShape = objectDef.Physics.Collider switch

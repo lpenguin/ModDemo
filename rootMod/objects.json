@@ -60,7 +60,19 @@
 			"physics": {
 				"type": "rigid_body",
 				"collider": {
-					"type": "box"
+					"type": "box",
+					"size": {
+						"x": 1.353,
+						"y": 1,
+						"z": 3.459
+					},
+					"transform": {
+						"position": {
+							"x": -0.187,
+							"y": 0.339,
+							"z": -0.041
+						}
+					}
 				},
 				"mass": 1500
 			},
