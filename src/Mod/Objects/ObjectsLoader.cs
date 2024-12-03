@@ -52,7 +52,7 @@ public static class ObjectsLoader
             CollisionShape3D collisionShape = objectDef.Physics.Collider switch
             {
                 BoxColliderProperties boxColliderProperties => CreateBoxCollider(GetAabb(mesh), boxColliderProperties),
-                MeshColliderProperties meshColliderProperties => CreateMeshCollider(meshColliderProperties),
+                MeshColliderProperties meshColliderProperties => CreateMeshCollider(meshColliderProperties, modDirectory),
                 _ => throw new NotSupportedException($"Unsupported collider type: {objectDef.Physics.Collider}")
             };
             collisionShape.Name = "CollisionShape";
@@ -111,12 +111,12 @@ public static class ObjectsLoader
 
         return collisionShape;
     }
-    private static CollisionShape3D CreateMeshCollider(MeshColliderProperties properties)
+    private static CollisionShape3D CreateMeshCollider(MeshColliderProperties properties, string modFolder)
     {
         var collisionShape = new CollisionShape3D();
     
         // Load the collision mesh
-        string meshPath = GodotPath.Combine("res://", properties.Mesh);
+        string meshPath = GodotPath.Combine(modFolder, ObjectsFolder, properties.Mesh);
         var collisionMesh = ResourceLoader.Load<Mesh>(meshPath);
     
         if (collisionMesh == null)
@@ -204,7 +204,7 @@ public static class ObjectsLoader
         {
             // TODO:
             BoxColliderProperties boxColliderProperties => CreateBoxCollider(GetAabb(visualInstance), boxColliderProperties),
-            MeshColliderProperties meshColliderProperties => CreateMeshCollider(meshColliderProperties),
+            MeshColliderProperties meshColliderProperties => CreateMeshCollider(meshColliderProperties, modDirectory),
             _ => throw new NotSupportedException($"Unsupported collider type: {objectDef.Physics.Collider}")
         };
         vehicleObject.AddChild(collisionShape);
