@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cvrnhw7gi7tll"
+path="res://.godot/imported/lattice.obj-970291cc309cc5867c0e61d7d5353606.mesh"
+
+[deps]
+
+files=["res://.godot/imported/lattice.obj-970291cc309cc5867c0e61d7d5353606.mesh"]
+
+source_file="res://rootMod/objects/lattice/lattice.obj"
+dest_files=["res://.godot/imported/lattice.obj-970291cc309cc5867c0e61d7d5353606.mesh", "res://.godot/imported/lattice.obj-970291cc309cc5867c0e61d7d5353606.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

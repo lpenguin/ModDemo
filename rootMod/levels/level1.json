@@ -1,22 +1,7 @@
 {
-  "id": "level1",
-  "name": "Level1",
+  "id": "arena",
+  "name": "Arena",
   "objects": [{
-	"name": "ground",
-	"objectId": "ground",
-	"transform": {
-	  "position": {
-		"x": 0,
-		"y": 0,
-		"z": 0
-	  },
-	  "scale": {
-		"x": 1,
-		"y": 1,
-		"z": 1
-	  }
-	}
-  }, {
 	"name": "mushroom1",
 	"objectId": "mushroom",
 	"transform": {
@@ -52,5 +37,16 @@
 			"z": 0
 		}
 	}
-}]
+  }, {
+	  "name": "arena",
+	  "objectId": "arena",
+	  "transform": {
+		  "position": {
+			  "x": -32,
+			  "y": -2,
+			  "z": 64
+		  }
+	  }
+  }
+  ]
 }

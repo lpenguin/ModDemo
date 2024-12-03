@@ -55,6 +55,22 @@
 			}
 		},
 		{
+			"id": "arena",
+			"type": "prop",
+			"mesh": {
+				"render": {
+					"mesh": "arena/arena.obj"
+				}
+			},
+			"physics": {
+				"type": "static",
+				"collider": {
+					"type": "mesh",
+					"mesh": "arena/collider.obj"
+				}
+			}
+		},
+		{
 			"id": "oxidized_monk",
 			"type": "scene",
 			"file": "oxidizedMonk/om1.tscn"

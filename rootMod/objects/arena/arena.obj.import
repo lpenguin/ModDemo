@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://ifj5gvkbkhrk"
+path="res://.godot/imported/arena.obj-ec8f82bab3b975c877681032456a2062.mesh"
+
+[deps]
+
+files=["res://.godot/imported/arena.obj-ec8f82bab3b975c877681032456a2062.mesh"]
+
+source_file="res://rootMod/objects/arena/arena.obj"
+dest_files=["res://.godot/imported/arena.obj-ec8f82bab3b975c877681032456a2062.mesh", "res://.godot/imported/arena.obj-ec8f82bab3b975c877681032456a2062.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
