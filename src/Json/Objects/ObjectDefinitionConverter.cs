@@ -14,10 +14,10 @@ public class ObjectDefinitionConverter : JsonConverter<ObjectDefinition>
 
         return type switch
         {
-            "prop" => JsonSerializer.Deserialize<PropObject>(root.GetRawText(), options),
-            "vehicle" => JsonSerializer.Deserialize<VehicleObject>(root.GetRawText(), options),
-            "scene" => JsonSerializer.Deserialize<SceneObject>(root.GetRawText(), options),
-            "weapon" => JsonSerializer.Deserialize<WeaponObject>(root.GetRawText(), options),
+            "prop" => JsonSerializer.Deserialize<PropDefinition>(root.GetRawText(), options),
+            "vehicle" => JsonSerializer.Deserialize<VehicleDefinition>(root.GetRawText(), options),
+            "scene" => JsonSerializer.Deserialize<SceneDefinition>(root.GetRawText(), options),
+            "weapon" => JsonSerializer.Deserialize<WeaponDefinition>(root.GetRawText(), options),
             _ => throw new JsonException($"Unknown object type: {type}")
         };
     }

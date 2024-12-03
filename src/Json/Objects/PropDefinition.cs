@@ -2,7 +2,7 @@
 
 namespace ModDemo.Json.Objects;
 
-public class PropObject : ObjectDefinition
+public class PropDefinition : ObjectDefinition
 {
     [JsonPropertyName("mesh")]
     public MeshProperties Mesh { get; set; }

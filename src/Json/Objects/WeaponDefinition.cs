@@ -3,7 +3,7 @@ using ModDemo.Json.Common;
 
 namespace ModDemo.Json.Objects
 {
-    public class WeaponObject : ObjectDefinition
+    public class WeaponDefinition : ObjectDefinition
     {
         [JsonPropertyName("mesh")]
         public MeshProperties Mesh { get; set; }

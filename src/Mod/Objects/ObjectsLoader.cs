@@ -23,10 +23,10 @@ public static class ObjectsLoader
         {
             Node3D node = objectDefinition switch
             {
-                ModDemo.Json.Objects.PropObject propObject => ReadProp(propObject, modDirectory),
-                ModDemo.Json.Objects.VehicleObject vehicleObject => ReadVehicle(vehicleObject, modDirectory),
-                ModDemo.Json.Objects.SceneObject sceneObject => ReadScene(sceneObject, modDirectory),
-                ModDemo.Json.Objects.WeaponObject veaponObject => ReadWeapon(veaponObject, modDirectory),
+                PropDefinition propDef => ReadProp(propDef, modDirectory),
+                VehicleDefinition vehicleDef => ReadVehicle(vehicleDef, modDirectory),
+                SceneDefinition sceneDef => ReadScene(sceneDef, modDirectory),
+                WeaponDefinition weaponDef => ReadWeapon(weaponDef, modDirectory),
                 _ => throw new NotImplementedException()
             };
 
@@ -36,31 +36,31 @@ public static class ObjectsLoader
         return collection;
     }
 
-    private static Node3D ReadWeapon(WeaponObject veaponObject, string modDirectory)
+    private static Node3D ReadWeapon(WeaponDefinition weaponObject, string modDirectory)
     {
         return null;
     }
 
-    private static Node3D ReadProp(PropObject objectDef, string modDirectory)
+    private static Node3D ReadProp(PropDefinition propDef, string modDirectory)
     {
         Node3D result;
-        Node3D mesh = LoadMesh(objectDef.Mesh, modDirectory);
+        Node3D mesh = LoadMesh(propDef.Mesh, modDirectory);
         
-        if (objectDef.Physics != null)
+        if (propDef.Physics != null)
         {
-            result = objectDef.Physics.Type switch
+            result = propDef.Physics.Type switch
             {
-                PhysicsType.RigidBody => new RigidBody3D { Mass = objectDef.Physics.Mass },
+                PhysicsType.RigidBody => new RigidBody3D { Mass = propDef.Physics.Mass },
                 PhysicsType.Static => new StaticBody3D(),
                 _ => throw new NotImplementedException()
             };
 
             // Create appropriate shape based on collider type
-            CollisionShape3D collisionShape = objectDef.Physics.Collider switch
+            CollisionShape3D collisionShape = propDef.Physics.Collider switch
             {
                 BoxColliderProperties boxColliderProperties => CreateBoxCollider(GetAabb(mesh), boxColliderProperties),
                 MeshColliderProperties meshColliderProperties => CreateMeshCollider(meshColliderProperties, modDirectory),
-                _ => throw new NotSupportedException($"Unsupported collider type: {objectDef.Physics.Collider}")
+                _ => throw new NotSupportedException($"Unsupported collider type: {propDef.Physics.Collider}")
             };
             collisionShape.Name = "CollisionShape";
             result.AddChild(collisionShape);
@@ -195,36 +195,36 @@ public static class ObjectsLoader
 
         return result;
     }
-    private static VehicleObject ReadVehicle(ModDemo.Json.Objects.VehicleObject objectDef, string modDirectory)
+    private static VehicleObject ReadVehicle(VehicleDefinition vehicleDef, string modDirectory)
     {
         var vehicleObject = new VehicleObject();
 
-        Node3D visualInstance = LoadMesh(objectDef.Mesh, modDirectory);
+        Node3D visualInstance = LoadMesh(vehicleDef.Mesh, modDirectory);
         vehicleObject.AddChild(visualInstance);
         
         // Set up vehicle properties
-        vehicleObject.MaxEngineForce = objectDef.Vehicle.EngineForce;
-        vehicleObject.MaxBrakeForce = objectDef.Vehicle.BrakeForce;
-        vehicleObject.MaxSteeringAngle = objectDef.Vehicle.SteeringAngle;
-        vehicleObject.WeaponSlots = objectDef.WeaponSlots.Select(v => v.ToGodot()).ToArray();
+        vehicleObject.MaxEngineForce = vehicleDef.Vehicle.EngineForce;
+        vehicleObject.MaxBrakeForce = vehicleDef.Vehicle.BrakeForce;
+        vehicleObject.MaxSteeringAngle = vehicleDef.Vehicle.SteeringAngle;
+        vehicleObject.WeaponSlots = vehicleDef.WeaponSlots.Select(v => v.ToGodot()).ToArray();
 
-        CollisionShape3D collisionShape = objectDef.Physics.Collider switch
+        CollisionShape3D collisionShape = vehicleDef.Physics.Collider switch
         {
             // TODO:
             BoxColliderProperties boxColliderProperties => CreateBoxCollider(GetAabb(visualInstance), boxColliderProperties),
             MeshColliderProperties meshColliderProperties => CreateMeshCollider(meshColliderProperties, modDirectory),
-            _ => throw new NotSupportedException($"Unsupported collider type: {objectDef.Physics.Collider}")
+            _ => throw new NotSupportedException($"Unsupported collider type: {vehicleDef.Physics.Collider}")
         };
         vehicleObject.AddChild(collisionShape);
 
         // Set up physics properties
-        if (objectDef.Physics != null)
+        if (vehicleDef.Physics != null)
         {
-            vehicleObject.Mass = objectDef.Physics.Mass;
+            vehicleObject.Mass = vehicleDef.Physics.Mass;
         }
 
         // Set up wheels
-        foreach (var wheelDef in objectDef.Wheels)
+        foreach (var wheelDef in vehicleDef.Wheels)
         {
             var wheel = new VehicleWheel3D();
             wheel.UseAsTraction = wheelDef.UseAsTraction;
@@ -238,9 +238,9 @@ public static class ObjectsLoader
         return vehicleObject;
     }
 
-    private static Node3D ReadScene(SceneObject objectDef, string modDirectory)
+    private static Node3D ReadScene(SceneDefinition sceneDef, string modDirectory)
     {
-        string scenePath = GodotPath.Combine(modDirectory, "objects", objectDef.File);
+        string scenePath = GodotPath.Combine(modDirectory, "objects", sceneDef.File);
         var scene = ResourceLoader.Load<PackedScene>(scenePath);
         if (scene == null)
         {

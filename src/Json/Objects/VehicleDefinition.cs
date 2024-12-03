@@ -4,7 +4,7 @@ using ModDemo.Json.Common;
 
 namespace ModDemo.Json.Objects;
 
-public class VehicleObject : ObjectDefinition
+public class VehicleDefinition : ObjectDefinition
 {
     [JsonPropertyName("physics")]
     public PhysicsProperties Physics { get; set; }
