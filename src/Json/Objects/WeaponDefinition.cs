@@ -24,7 +24,7 @@ namespace ModDemo.Json.Objects
         public float Damage { get; set; }
 
         [JsonPropertyName("color")]
-        public Vector3 Color { get; set; }
+        public Color Color { get; set; }
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]

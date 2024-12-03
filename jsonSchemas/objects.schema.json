@@ -58,6 +58,15 @@
         "z": { "type": "number" }
       }
     },
+    "color": {
+      "type": "object",
+      "required": ["r", "g", "b"],
+      "properties": {
+        "r": { "type": "number" },
+        "g": { "type": "number" },
+        "b": { "type": "number" }
+      }
+    },
     "transform": {
       "type": "object",
       "properties": {
@@ -221,7 +230,7 @@
               "description": "Amount of damage dealt by the projectile"
             },
             "color": {
-              "$ref": "#/$defs/vector3",
+              "$ref": "#/$defs/color",
               "description": "Color of the projectile (RGB values from 0 to 1)"
             }
           }

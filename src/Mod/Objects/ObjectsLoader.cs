@@ -35,10 +35,41 @@ public static class ObjectsLoader
 
         return collection;
     }
-
-    private static Node3D ReadWeapon(WeaponDefinition weaponObject, string modDirectory)
+    private static Node3D ReadWeapon(WeaponDefinition weaponDef, string modDirectory)
     {
-        return null;
+        
+    
+        // Load and add mesh
+        Node3D mesh = LoadMesh(weaponDef.Mesh, modDirectory);
+    
+        // Handle physics if specified
+        Node3D physicsNode = weaponDef.Physics.Type switch
+        {
+            PhysicsType.RigidBody => new RigidBody3D { Mass = weaponDef.Physics.Mass },
+            PhysicsType.Static => new StaticBody3D(),
+            _ => throw new NotImplementedException()
+        };
+
+        // Create appropriate shape based on collider type
+        CollisionShape3D collisionShape = weaponDef.Physics.Collider switch
+        {
+            BoxColliderProperties boxColliderProperties => CreateBoxCollider(GetAabb(mesh), boxColliderProperties),
+            MeshColliderProperties meshColliderProperties => CreateMeshCollider(meshColliderProperties, modDirectory),
+            _ => throw new NotSupportedException($"Unsupported collider type: {weaponDef.Physics.Collider}")
+        };
+        collisionShape.Name = "CollisionShape";
+        physicsNode.AddChild(collisionShape);
+        physicsNode.AddChild(mesh);
+        
+
+        var weaponObject = GodotScript.AttachScript<WeaponObject>(physicsNode);
+
+        // Set projectile properties
+        weaponObject.ProjectileType = weaponDef.Projectile.Type;
+        weaponObject.ProjectileDamage = weaponDef.Projectile.Damage;
+        weaponObject.ProjectileColor = weaponDef.Projectile.Color.ToGodot();
+
+        return weaponObject;
     }
 
     private static Node3D ReadProp(PropDefinition propDef, string modDirectory)
