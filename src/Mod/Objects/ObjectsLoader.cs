@@ -245,9 +245,7 @@ public static class ObjectsLoader
     {
         if (visualInstance is MeshInstance3D { Mesh: not null } meshInstance)
         {
-            var aabb = meshInstance.Mesh.GetAabb();
-            aabb.Size *= meshInstance.Scale;
-            return aabb;
+            return GetAabb(meshInstance);
         }
         
         Aabb combinedAabb = new Aabb();
@@ -257,11 +255,8 @@ public static class ObjectsLoader
         {
             if (child is not MeshInstance3D childMeshInstance || childMeshInstance.Mesh == null)
                 continue;
-                
-            Aabb childAabb = childMeshInstance.Mesh.GetAabb();
-            childAabb.Position *= childMeshInstance.Scale;
-            childAabb.Position += childMeshInstance.Position;
-            childAabb.Size *= childMeshInstance.Scale;
+
+            Aabb childAabb = GetAabb(childMeshInstance);
             
             if (first)
             {
@@ -275,5 +270,14 @@ public static class ObjectsLoader
         }
         
         return combinedAabb;
+    }
+
+    private static Aabb GetAabb(MeshInstance3D meshInstance)
+    {
+        var aabb = meshInstance.Mesh.GetAabb();
+        aabb.Size *= meshInstance.Scale;
+        aabb.Position *= meshInstance.Scale;
+        aabb.Position += meshInstance.Position;
+        return aabb;
     }
 }
