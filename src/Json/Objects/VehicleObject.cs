@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using ModDemo.Json.Common;
 
 namespace ModDemo.Json.Objects;
 
@@ -16,4 +17,8 @@ public class VehicleObject : ObjectDefinition
 
     [JsonPropertyName("wheels")]
     public List<WheelProperties> Wheels { get; set; }
+    
+    [JsonPropertyName("weapon_slots")]
+    public List<Vector3> WeaponSlots { get; set; }
+
 }

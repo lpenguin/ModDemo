@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Godot;
 using ModDemo.Json.Common.Extensions;
 using ModDemo.Json.Objects;
@@ -25,6 +26,7 @@ public static class ObjectsLoader
                 ModDemo.Json.Objects.PropObject propObject => ReadProp(propObject, modDirectory),
                 ModDemo.Json.Objects.VehicleObject vehicleObject => ReadVehicle(vehicleObject, modDirectory),
                 ModDemo.Json.Objects.SceneObject sceneObject => ReadScene(sceneObject, modDirectory),
+                ModDemo.Json.Objects.WeaponObject veaponObject => ReadWeapon(veaponObject, modDirectory),
                 _ => throw new NotImplementedException()
             };
 
@@ -32,6 +34,11 @@ public static class ObjectsLoader
         }
 
         return collection;
+    }
+
+    private static Node3D ReadWeapon(WeaponObject veaponObject, string modDirectory)
+    {
+        return null;
     }
 
     private static Node3D ReadProp(PropObject objectDef, string modDirectory)
@@ -199,6 +206,7 @@ public static class ObjectsLoader
         vehicleObject.MaxEngineForce = objectDef.Vehicle.EngineForce;
         vehicleObject.MaxBrakeForce = objectDef.Vehicle.BrakeForce;
         vehicleObject.MaxSteeringAngle = objectDef.Vehicle.SteeringAngle;
+        vehicleObject.WeaponSlots = objectDef.WeaponSlots.Select(v => v.ToGodot()).ToArray();
 
         CollisionShape3D collisionShape = objectDef.Physics.Collider switch
         {

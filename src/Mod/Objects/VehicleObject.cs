@@ -16,7 +16,8 @@ public partial class VehicleObject : VehicleBody3D
     [Export] public float MaxEngineForce { get; set; } = 100.0f;
     [Export] public float SteeringSpeed { get; set; } = 5.0f;
     [Export] public bool ControlledByPlayer { get; set; }
-    
+    [Export] public Vector3[] WeaponSlots { get; set; }
+
     private const float VELOCITY_THRESHOLD = 0.5f;
     private GearState currentGear = GearState.Forward;
     private float currentSteering = 0.0f;

@@ -7,6 +7,7 @@ namespace ModDemo.Json.Objects
     {
         Prop,
         Vehicle,
-        Scene
+        Scene,
+        Weapon
     }
 }

@@ -76,8 +76,42 @@
 			"file": "oxidizedMonk/om1.tscn"
 		},
 		{
+			"id": "machotine",
+			"type": "weapon",
+			"mesh": {
+				"render": {
+					"mesh": "machotine/machotine.obj"
+				}
+			},
+			"physics": {
+				"type": "rigid_body",
+				"collider": {
+					"type": "box"
+				},
+				"mass": 1.0
+			},
+			"projectile": {
+				"type": "bullet",
+				"damage": 10.0,
+				"color": {
+					"x": 1.0,
+					"y": 0.0,
+					"z": 0.0
+				}
+			}
+		},
+		{
 			"id": "oxidized_monk_vehicle",
 			"type": "vehicle",
+			"weapon_slots": [{
+				"x": 0.472,
+				"y": 0.801,
+				"z": -0.682
+			}, {
+				"x": -0.472,
+				"y": 0.801,
+				"z": -0.682
+			}],
 			"physics": {
 				"type": "rigid_body",
 				"collider": {

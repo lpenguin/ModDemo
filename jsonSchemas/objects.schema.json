@@ -23,17 +23,28 @@
             "description": "Type of the object"
           }
         },
-        "if": {
-          "properties": { "type": { "const": "prop" } }
-        },
-        "then": { "$ref": "#/$defs/propObject" },
-        "else": {
-          "if": {
-            "properties": { "type": { "const": "vehicle" } }
-          },
-          "then": { "$ref": "#/$defs/vehicleObject" },
-          "else": { "$ref": "#/$defs/sceneObject" }
-        }
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "properties": { "type": { "const": "prop" } },
+                "allOf": [{ "$ref": "#/$defs/propObject" }]
+              },
+              {
+                "properties": { "type": { "const": "vehicle" } },
+                "allOf": [{ "$ref": "#/$defs/vehicleObject" }]
+              },
+              {
+                "properties": { "type": { "const": "weapon" } },
+                "allOf": [{ "$ref": "#/$defs/weaponObject" }]
+              },
+              {
+                "properties": { "type": { "const": "scene" } },
+                "allOf": [{ "$ref": "#/$defs/sceneObject" }]
+              }
+            ]
+          }
+        ]
       }
     }
   },
@@ -71,40 +82,26 @@
     },
     "collider": {
       "type": "object",
-      "required": ["type", "transform"],
+      "required": ["type"],
       "properties": {
         "type": {
           "type": "string",
           "enum": ["box", "mesh"],
           "description": "Type of collider"
-        },
-        "transform": { "$ref": "#/$defs/transform" }
+        }
       },
       "allOf": [
         {
-          "if": {
-            "properties": { "type": { "const": "box" } }
-          },
-          "then": {
-            "required": ["size"],
-            "properties": {
-              "size": { "$ref": "#/$defs/vector3" }
+          "oneOf": [
+            {
+              "properties": { "type": { "const": "box" } },
+              "allOf": [{ "$ref": "#/$defs/boxColliderObject" }]
+            },
+            {
+              "properties": { "type": { "const": "mesh" } },
+              "allOf": [{ "$ref": "#/$defs/meshColliderObject" }]
             }
-          }
-        },
-        {
-          "if": {
-            "properties": { "type": { "const": "mesh" } }
-          },
-          "then": {
-            "required": ["mesh"],
-            "properties": {
-              "mesh": {
-                "type": "string",
-                "description": "Path to the collision mesh file"
-              }
-            }
-          }
+          ]
         }
       ]
     },
@@ -182,6 +179,11 @@
             }
           }
         },
+        "weapon_slots": {
+          "type": "array",
+          "description": "Array of weapon mounting points",
+          "items": { "$ref": "#/$defs/vector3" }
+        },
         "mesh": { "$ref": "#/$defs/meshProperties" },
         "wheels": {
           "type": "array",
@@ -196,6 +198,54 @@
         "file": {
           "type": "string",
           "description": "Path to the scene file"
+        }
+      }
+    },
+    "weaponObject": {
+      "type": "object",
+      "required": ["mesh", "physics", "projectile"],
+      "properties": {
+        "mesh": { "$ref": "#/$defs/meshProperties" },
+        "physics": { "$ref": "#/$defs/physics" },
+        "projectile": {
+          "type": "object",
+          "required": ["type", "damage", "color"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["bullet"],
+              "description": "Type of projectile"
+            },
+            "damage": {
+              "type": "number",
+              "description": "Amount of damage dealt by the projectile"
+            },
+            "color": {
+              "$ref": "#/$defs/vector3",
+              "description": "Color of the projectile (RGB values from 0 to 1)"
+            }
+          }
+        }
+      }
+    },
+    
+    "boxColliderObject": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "transform": { "$ref": "#/$defs/transform" },
+        "size": { "$ref": "#/$defs/vector3" }
+      }
+    },
+
+    "meshColliderObject": {
+      "type": "object",
+      "required": ["mesh"],
+      "properties": {
+        "transform": { "$ref": "#/$defs/transform" },
+        "mesh": {
+          "type": "string",
+          "description": "Path to the collision mesh file"
         }
       }
     }
