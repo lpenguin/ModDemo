@@ -8,6 +8,7 @@ namespace ModDemo.Json.Objects
         Prop,
         Vehicle,
         Scene,
-        Weapon
+        Weapon,
+        Empty
     }
 }

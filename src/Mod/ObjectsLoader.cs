@@ -29,10 +29,10 @@ public static class ObjectsLoader
                 VehicleDefinition vehicleDef => ReadVehicle(vehicleDef, modDirectory),
                 SceneDefinition sceneDef => ReadScene(sceneDef, modDirectory),
                 WeaponDefinition weaponDef => ReadWeapon(weaponDef, modDirectory),
+                EmptyDefinition => ReadEmpty(),
                 _ => throw new NotImplementedException()
             };
 
-            collection.AddObject(objectDefinition.Id, node);
             if (objectDefinition.Script != null)
             {
                 node.AddChild(new ScriptNode
@@ -40,9 +40,16 @@ public static class ObjectsLoader
                     Script = ReadScript(modDirectory, objectDefinition.Script),
                 });
             }
+
+            collection.AddObject(objectDefinition.Id, node);
         }
 
         return collection;
+    }
+
+    private static Node3D ReadEmpty()
+    {
+        return new Node3D();
     }
 
     private static string ReadScript(string modDirectory, string script)

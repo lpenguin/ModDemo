@@ -45,6 +45,10 @@
               {
                 "properties": { "type": { "const": "scene" } },
                 "allOf": [{ "$ref": "#/$defs/sceneObject" }]
+              },
+              {
+                "properties": { "type": { "const": "empty" } },
+                "allOf": [{ "$ref": "#/$defs/emptyObject" }]
               }
             ]
           }
@@ -293,6 +297,11 @@
           "description": "Path to the collision mesh file"
         }
       }
+    },
+    "emptyObject": {
+      "type": "object",
+      "required": [],
+      "properties": {}
     }
   }
 }

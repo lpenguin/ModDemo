@@ -8,6 +8,7 @@ namespace ModDemo.Json.Objects
     [JsonDerivedType("vehicle", typeof(VehicleDefinition))]
     [JsonDerivedType("scene", typeof(SceneDefinition))]
     [JsonDerivedType("weapon", typeof(WeaponDefinition))]
+    [JsonDerivedType("empty", typeof(EmptyDefinition))]
     public abstract class ObjectDefinition
     {
         [JsonPropertyName("id")]
