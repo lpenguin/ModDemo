@@ -7,21 +7,22 @@ namespace ModDemo.Nodes;
 public partial class VehicleCamera : Camera3D
 {
     [Export] public float FollowDistance = 5.0f;
-    [Export] public float MinZoomDistance = 2.0f;
-    [Export] public float MaxZoomDistance = 10.0f;
+    [Export] public float MinDistance = 2.0f;
+    [Export] public float MaxDistance = 10.0f;
     [Export] public float ZoomSpeed = 0.5f;
-    [Export] public float RotationSpeed = 2.0f;
     [Export] public float HeightOffset = 2.0f;
     [Export] public float PositionSmoothSpeed = 5.0f;
-    [Export] public float RotationSmoothSpeed = 3.0f;
-    [Export] public float MinVerticalAngle = -30.0f; // Changed: limited to -30 degrees to prevent seeing underneath
-    [Export] public float MaxVerticalAngle = 60.0f;  // Kept at 60 degrees for looking up
+    [Export] public float ReturnToDefaultDelay = 1.5f;
+    [Export] public float ReturnSpeed = 2.0f;
+    [Export] public float MouseSensitivity = 0.003f;
+    [Export] public float MaxVerticalOffset = 3.0f;
+    [Export] public float MaxHorizontalOffset = 10.0f;
     
     private VehicleObject? _targetVehicle;
-    private float _currentDistance;
-    private float _currentRotationAngle;
-    private float _currentVerticalAngle;
     private Vector3 _targetPosition;
+    private float _currentDistance;
+    private float _lastInputTime;
+    private Vector2 _cameraOffset = Vector2.Zero; // X = horizontal, Y = vertical offset
     
     public override void _Ready()
     {
@@ -36,27 +37,34 @@ public partial class VehicleCamera : Camera3D
 
     private void Setup(VehicleObject vehicle)
     {
-        _currentDistance = FollowDistance;
-        _currentVerticalAngle = 0.0f; // Initialize vertical angle
-        
         _targetVehicle = vehicle;
+        _currentDistance = FollowDistance;
+        _cameraOffset = Vector2.Zero;
+        
         if (_targetVehicle == null)
         {
             GD.PrintErr("VehicleCamera: No player-controlled vehicle found!");
             return;
         }
         
-        // Set initial position
         UpdateCameraPosition();
     }
 
     public override void _Process(double delta)
     {
         if (_targetVehicle == null) return;
+
+        // Check if we should return to default position
+        float timeSinceInput = (float)Time.GetTicksMsec() / 1000.0f - _lastInputTime;
+        if (timeSinceInput > ReturnToDefaultDelay)
+        {
+            // Smoothly return to default position
+            _cameraOffset = _cameraOffset.Lerp(Vector2.Zero, ReturnSpeed * (float)delta);
+        }
         
         UpdateCameraPosition();
         
-        // Smooth position and rotation
+        // Smooth camera position
         Position = Position.Lerp(_targetPosition, PositionSmoothSpeed * (float)delta);
         
         // Make camera look at vehicle
@@ -70,26 +78,32 @@ public partial class VehicleCamera : Camera3D
 
         if (inputEvent is InputEventMouseButton mouseButton)
         {
+            _lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
+            
             if (mouseButton.ButtonIndex == MouseButton.WheelUp)
             {
-                _currentDistance = Mathf.Max(_currentDistance - ZoomSpeed, MinZoomDistance);
+                _currentDistance = Mathf.Max(_currentDistance - ZoomSpeed, MinDistance);
             }
             else if (mouseButton.ButtonIndex == MouseButton.WheelDown)
             {
-                _currentDistance = Mathf.Min(_currentDistance + ZoomSpeed, MaxZoomDistance);
+                _currentDistance = Mathf.Min(_currentDistance + ZoomSpeed, MaxDistance);
             }
         }
         else if (inputEvent is InputEventMouseMotion mouseMotion)
         {
-            // Horizontal rotation
-            _currentRotationAngle -= mouseMotion.Relative.X * RotationSpeed * 0.01f;
+            _lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
             
-            // Vertical rotation (inverted by removing the negative sign)
-            _currentVerticalAngle += mouseMotion.Relative.Y * RotationSpeed * 0.01f;
-            // Clamp vertical angle to prevent over-rotation
-            _currentVerticalAngle = Mathf.Clamp(_currentVerticalAngle, 
-                Mathf.DegToRad(MinVerticalAngle), 
-                Mathf.DegToRad(MaxVerticalAngle));
+            // Update camera offset based on mouse movement
+            _cameraOffset += new Vector2(
+                mouseMotion.Relative.X * MouseSensitivity,
+                mouseMotion.Relative.Y * MouseSensitivity
+            );
+            
+            // Clamp the offset
+            _cameraOffset = new Vector2(
+                Mathf.Clamp(_cameraOffset.X, -MaxHorizontalOffset, MaxHorizontalOffset),
+                Mathf.Clamp(_cameraOffset.Y, -MaxVerticalOffset, MaxVerticalOffset)
+            );
         }
     }
 
@@ -97,19 +111,19 @@ public partial class VehicleCamera : Camera3D
     {
         Vector3 vehiclePos = _targetVehicle.GlobalPosition;
         
-        // Calculate camera position using spherical coordinates
-        float horizontalDistance = _currentDistance * Mathf.Cos(_currentVerticalAngle);
-        float verticalOffset = _currentDistance * Mathf.Sin(_currentVerticalAngle);
+        // Get vehicle's backward direction (we want camera to be behind)
+        Vector3 vehicleBack = -_targetVehicle.Transform.Basis.Z;
+        Vector3 vehicleRight = _targetVehicle.Transform.Basis.X;
         
-        Vector3 offset = new Vector3(
-            Mathf.Sin(_currentRotationAngle) * horizontalDistance,
-            HeightOffset + verticalOffset,
-            Mathf.Cos(_currentRotationAngle) * horizontalDistance
-        );
+        // Apply offsets relative to vehicle orientation
+        Vector3 baseOffset = vehicleBack * _currentDistance;
+        Vector3 horizontalOffset = vehicleRight * _cameraOffset.X;
+        Vector3 verticalOffset = Vector3.Up * (_cameraOffset.Y + HeightOffset + 2);
         
-        _targetPosition = vehiclePos + offset;
+        // Calculate final camera position
+        _targetPosition = vehiclePos + baseOffset + horizontalOffset + verticalOffset;
         
-        // Ray casting to prevent camera from clipping through walls
+        // Prevent camera from clipping through walls
         var spaceState = GetWorld3D().DirectSpaceState;
         var query = PhysicsRayQueryParameters3D.Create(
             vehiclePos + Vector3.Up * HeightOffset,
