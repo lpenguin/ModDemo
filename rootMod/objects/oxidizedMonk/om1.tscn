@@ -14,7 +14,8 @@ physics_material_override = SubResource("PhysicsMaterial_66ie6")
 script = ExtResource("1_0hn1t")
 MaxBrakeForce = 0.5
 MaxSteeringAngle = 0.5
-MaxEngineForce = 50.0
+MaxEngineForce = 200.0
+MaxSpeed = 10.0
 WeaponSlots = PackedVector3Array(0.472, 0.801, -0.682, -0.472, 0.801, -0.682)
 
 [node name="body" parent="." instance=ExtResource("2_ilrxr")]
