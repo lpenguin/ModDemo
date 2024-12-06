@@ -1,6 +1,11 @@
 {
 	"objects": [
 		{
+			"id": "mainLogic",
+			"type": "empty",
+			"script": "mainLogic/mainLogic.lua"
+		},
+		{
 			"id": "ground",
 			"type": "prop",
 			"mesh": {

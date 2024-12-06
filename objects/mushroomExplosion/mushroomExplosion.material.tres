@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://c66ju866uuwi5"]
+
+[ext_resource type="Texture2D" uid="uid://cqdl1hyqe306u" path="res://objects/mushroomExplosion/Fart/fart01.png" id="1_h4wud"]
+
+[resource]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.188352, 0.418855, 0.267626, 1)
+albedo_texture = ExtResource("1_h4wud")

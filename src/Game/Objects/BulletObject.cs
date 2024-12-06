@@ -1,4 +1,5 @@
 ﻿using Godot;
+using ModDemo.Nodes;
 using ModDemo.Util.Extensions;
 
 namespace ModDemo.Game.Objects;
@@ -16,7 +17,7 @@ public partial class BulletObject: StaticBody3D
 
     private MeshInstance3D? _meshInstance;
     
-    private static readonly PackedScene ExplosionPrefab = GD.Load<PackedScene>("res://objects/explosion/explosion.tscn");
+    
     public override void _Ready()
     {
         _meshInstance = GetNode<MeshInstance3D>("MeshInstance3D");
@@ -33,10 +34,7 @@ public partial class BulletObject: StaticBody3D
         KinematicCollision3D? collision = MoveAndCollide(forward * Speed * (float) delta);
         if (collision != null)
         {
-            GpuParticles3D explosion = ExplosionPrefab.Instantiate<GpuParticles3D>();
-            GetTree().Root.AddChild(explosion);
-            explosion.GlobalPosition = collision.GetPosition();
-            explosion.Emitting = true;
+            EffectManager.Instance.PlayEffect(EffectManager.EffectType.BulletHit, collision.GetPosition());
 
             if (collision.GetCollider() is Node node)
             {

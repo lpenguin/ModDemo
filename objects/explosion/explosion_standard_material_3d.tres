@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://c3405wangq7hc"]
+
+[ext_resource type="Texture2D" uid="uid://cjw3xwtfae4ss" path="res://objects/explosion/Explosion/explosion00.png" id="1_62e0g"]
+
+[resource]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_62e0g")

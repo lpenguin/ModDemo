@@ -1,56 +1,19 @@
-[gd_scene load_steps=9 format=3 uid="uid://cpex7xito6vmi"]
+[gd_scene load_steps=4 format=3 uid="uid://cpex7xito6vmi"]
 
-[ext_resource type="Texture2D" uid="uid://cjw3xwtfae4ss" path="res://objects/explosion/Explosion/explosion00.png" id="1_2dcpb"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oghnu"]
-transparency = 1
-blend_mode = 1
-shading_mode = 0
-vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("1_2dcpb")
-
-[sub_resource type="Curve" id="Curve_wt0bk"]
-_data = [Vector2(0.0179104, 0.0146886), 0.0, 0.0, 0, 0, Vector2(0.268657, 0.984724), 0.0, 0.0, 0, 0, Vector2(0.597015, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
-point_count = 4
-
-[sub_resource type="CurveTexture" id="CurveTexture_7ev5f"]
-curve = SubResource("Curve_wt0bk")
-
-[sub_resource type="Curve" id="Curve_e7op7"]
-_data = [Vector2(0, 0.0452409), 0.0, 0.0, 0, 0, Vector2(0.197015, 1), 0.0, 0.0, 0, 0, Vector2(0.501493, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.00705051), 0.0, 0.0, 0, 0]
-point_count = 4
-
-[sub_resource type="CurveTexture" id="CurveTexture_266cy"]
-curve = SubResource("Curve_e7op7")
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_7uon1"]
-emission_shape = 1
-emission_sphere_radius = 0.2
-angle_min = -415.3
-angle_max = 170.8
-direction = Vector3(1, 1, 1)
-spread = 180.0
-gravity = Vector3(0, 0, 0)
-damping_min = 62.263
-damping_max = 62.802
-attractor_interaction_enabled = false
-scale_min = 0.2
-scale_max = 0.2
-scale_curve = SubResource("CurveTexture_266cy")
-alpha_curve = SubResource("CurveTexture_7ev5f")
+[ext_resource type="Material" uid="uid://c3405wangq7hc" path="res://objects/explosion/explosion_standard_material_3d.tres" id="1_togge"]
+[ext_resource type="Material" uid="uid://bq7gkwy53wkmr" path="res://objects/explosion/explosion_particle_process_material.tres" id="2_esfi6"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_vi4ul"]
 
 [node name="Node3D" type="GPUParticles3D"]
-material_override = SubResource("StandardMaterial3D_oghnu")
+material_override = ExtResource("1_togge")
 cast_shadow = 0
-emitting = false
 amount = 100
-lifetime = 0.27
+lifetime = 0.39
 one_shot = true
-explosiveness = 0.65
+explosiveness = 0.85
 randomness = 0.66
 local_coords = true
 transform_align = 1
-process_material = SubResource("ParticleProcessMaterial_7uon1")
+process_material = ExtResource("2_esfi6")
 draw_pass_1 = SubResource("QuadMesh_vi4ul")

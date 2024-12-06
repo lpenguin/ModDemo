@@ -2,6 +2,16 @@
   "id": "arena",
   "name": "Arena",
   "objects": [{
+	  "name": "mainLogic",
+	  "objectId": "mainLogic",
+	  "transform": {
+		  "position": {
+			  "x": 0,
+			  "y": 0,
+			  "z": 0
+		  }
+	  }
+  }, {
 	"name": "mushroom1",
 	"objectId": "mushroom",
 	"transform": {
@@ -12,6 +22,16 @@
 	  }
 	}
   }, {
+	  "name": "mushroom2",
+	  "objectId": "mushroom",
+	  "transform": {
+		  "position": {
+			  "x": 5,
+			  "y": 0,
+			  "z": 0
+		  }
+	  }
+  },{
 	"name": "cube1",
 	"objectId": "cube",
 	"transform": {
