@@ -33,10 +33,23 @@ public static class ObjectsLoader
             };
 
             collection.AddObject(objectDefinition.Id, node);
+            if (objectDefinition.Script != null)
+            {
+                node.AddChild(new ScriptNode
+                {
+                    Script = ReadScript(modDirectory, objectDefinition.Script),
+                });
+            }
         }
 
         return collection;
     }
+
+    private static string ReadScript(string modDirectory, string script)
+    {
+        return GodotFile.ReadAllText(GodotPath.Combine(modDirectory, ObjectsFolder, script));
+    }
+
     private static Node3D ReadWeapon(WeaponDefinition weaponDef, string modDirectory)
     {
         

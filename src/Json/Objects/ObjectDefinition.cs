@@ -15,5 +15,8 @@ namespace ModDemo.Json.Objects
 
         [JsonPropertyName("type")]
         public ObjectType Type { get; set; }
+        
+        [JsonPropertyName("script")]
+        public string? Script { get; set; }
     }
 }

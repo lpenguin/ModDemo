@@ -21,6 +21,10 @@
             "type": "string",
             "enum": ["prop", "vehicle", "scene"],
             "description": "Type of the object"
+          },
+          "script": {
+            "type": "string",
+            "description": "Path to the script file"
           }
         },
         "allOf": [

@@ -35,6 +35,7 @@
 		{
 			"id": "mushroom",
 			"type": "prop",
+			"script": "mushroom/mushroom.lua",
 			"mesh": {
 				"render": {
 					"mesh": "mushroom/mushroom.obj"

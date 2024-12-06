@@ -1,4 +1,5 @@
 ﻿using Godot;
+using ModDemo.Util.Extensions;
 
 namespace ModDemo.Game.Objects;
 
@@ -36,6 +37,14 @@ public partial class BulletObject: StaticBody3D
             GetTree().Root.AddChild(explosion);
             explosion.GlobalPosition = collision.GetPosition();
             explosion.Emitting = true;
+
+            if (collision.GetCollider() is Node node)
+            {
+                if (node.TryGetChild<IDamageHandler>(out var damageHandler))
+                {
+                    damageHandler!.ApplyDamage(Damage);
+                }
+            }
             QueueFree();
         }
     }

@@ -19,6 +19,7 @@
     <Content Include="rootMod\objects\ground\ground.obj.import" />
     <Content Include="rootMod\objects\ground\ground.png" />
     <Content Include="rootMod\objects\ground\ground.png.import" />
+    <Content Include="rootMod\objects\mushroom\mushroom.lua" />
     <Content Include="rootMod\objects\mushroom\mushroom.mtl" />
     <Content Include="rootMod\objects\mushroom\mushroom.obj" />
     <Content Include="rootMod\objects\mushroom\mushroom.obj.import" />
@@ -26,5 +27,12 @@
     <Content Include="rootMod\objects\oxidizedMonk\body.fbx.import" />
     <Content Include="rootMod\objects\oxidizedMonk\wheel.fbx" />
     <Content Include="rootMod\objects\oxidizedMonk\wheel.fbx.import" />
+    <Content Include="src\Mod\ObjectsLoader.cs.uid" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\Game\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MoonSharp" Version="2.0.0" />
   </ItemGroup>
 </Project>
