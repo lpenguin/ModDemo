@@ -1,6 +1,6 @@
 ﻿using Godot;
 using ModDemo.Core;
-using ModDemo.Mod.Objects;
+using ModDemo.Game.Objects;
 
 namespace ModDemo.Nodes;
 
@@ -27,7 +27,7 @@ public partial class VehicleCamera : Camera3D
     {
         SignalBus.Instance.SignalDispatched += (name, args) =>
         {
-            if (name == "VehiclePossessed" && args.As<VehicleObject>() is { } vehicle)
+            if (name == VehicleObject.SignalNameVehiclePossessed && args.As<VehicleObject>() is { } vehicle)
             {
                 Setup(vehicle);
             }

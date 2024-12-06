@@ -28,7 +28,7 @@
           },
           "transform": { "$ref": "#/$defs/transform"},
           "tags": {
-            "type": "array",
+            "type": "object",
             "items": {
               "type": "string",
               "description": "Tags associated with this instance",

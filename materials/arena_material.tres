@@ -1,0 +1,17 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://du2co2ldq00kg"]
+
+[ext_resource type="Shader" uid="uid://xvpyy00ljh7l" path="res://materials/arena_material.gdshader" id="1_gjmxn"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_gjmxn")
+shader_parameter/noise_scale = 0.05
+shader_parameter/noise_detail = 15.0
+shader_parameter/noise_roughness = 0.5
+shader_parameter/noise_lacunarity = 2.0
+shader_parameter/noise_distortion = 0.0
+shader_parameter/roughness = 1.0
+shader_parameter/metallic = 0.0
+shader_parameter/alpha = 1.0
+shader_parameter/bump_strength = 1.0
+shader_parameter/bump_distance = 5.0

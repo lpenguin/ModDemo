@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Godot;
 
-namespace ModDemo.Mod.Objects;
+namespace ModDemo.Game.Objects;
 
 public class ObjectsCollection
 {

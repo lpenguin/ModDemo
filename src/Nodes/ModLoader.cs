@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using ModDemo.Game.Objects;
 using ModDemo.Json.Levels;
-using ModDemo.Mod.Objects;
+using ModDemo.Mod;
 using ModDemo.Util;
 
 namespace ModDemo.Nodes;

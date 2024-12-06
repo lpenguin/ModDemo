@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://yail2768xxa2"]
+
+[ext_resource type="Script" uid="uid://cwnrnjxbtprux" path="res://src/Game/Objects/BulletObject.cs" id="1_nwyki"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nwyki"]
+transparency = 1
+specular_mode = 2
+albedo_color = Color(1, 0.0428135, 0.226665, 1)
+emission_enabled = true
+emission = Color(0.992157, 0, 0, 1)
+disable_receive_shadows = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_a2jwo"]
+size = Vector3(0.04, 0.04, 0.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nmwin"]
+size = Vector3(0.1, 0.1, 0.8)
+
+[node name="StaticBody3D" type="StaticBody3D"]
+script = ExtResource("1_nwyki")
+Damage = 10.0
+Color = Color(0.941176, 0, 0, 1)
+Speed = 30.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.360167)
+material_override = SubResource("StandardMaterial3D_nwyki")
+mesh = SubResource("BoxMesh_a2jwo")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.330907)
+shape = SubResource("BoxShape3D_nmwin")

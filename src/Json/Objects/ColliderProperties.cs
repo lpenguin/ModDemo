@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using ModDemo.Json.Common;
+using ModDemo.Json.Converter;
 
 namespace ModDemo.Json.Objects;
 
@@ -9,7 +10,9 @@ public enum ColliderType
     Mesh
 }
 
-[JsonConverter(typeof(ColliderPropertiesConverter))]
+[JsonDerivedTypeConverter("type")]
+[JsonDerivedType("box", typeof(BoxColliderProperties))]
+[JsonDerivedType("mesh", typeof(MeshColliderProperties))]
 public abstract class ColliderProperties
 {
     [JsonPropertyName("type")]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://c01vssn4uuc6y"]
 
-[ext_resource type="Script" uid="uid://no6goaqghuhi" path="res://src/Mod/Objects/VehicleObject.cs" id="1_0hn1t"]
+[ext_resource type="Script" uid="uid://no6goaqghuhi" path="res://src/Game/Objects/VehicleObject.cs" id="1_0hn1t"]
 [ext_resource type="PackedScene" uid="uid://ch6iu3vm2861g" path="res://rootMod/objects/oxidizedMonk/body.fbx" id="2_ilrxr"]
 [ext_resource type="PackedScene" uid="uid://dbsb3u7hcla3u" path="res://rootMod/objects/oxidizedMonk/wheel.fbx" id="3_i2j3a"]
 
@@ -15,6 +15,7 @@ script = ExtResource("1_0hn1t")
 MaxBrakeForce = 0.5
 MaxSteeringAngle = 0.5
 MaxEngineForce = 50.0
+WeaponSlots = PackedVector3Array(0.472, 0.801, -0.682, -0.472, 0.801, -0.682)
 
 [node name="body" parent="." instance=ExtResource("2_ilrxr")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)

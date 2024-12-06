@@ -2,12 +2,14 @@
 using System.IO;
 using System.Linq;
 using Godot;
+using ModDemo.Game.Objects;
+using ModDemo.Json.Common;
 using ModDemo.Json.Common.Extensions;
 using ModDemo.Json.Objects;
 using ModDemo.Util;
 using Vector3 = Godot.Vector3;
 
-namespace ModDemo.Mod.Objects;
+namespace ModDemo.Mod;
 
 public static class ObjectsLoader
 {
@@ -67,7 +69,15 @@ public static class ObjectsLoader
         // Set projectile properties
         weaponObject.ProjectileType = weaponDef.Projectile.Type;
         weaponObject.ProjectileDamage = weaponDef.Projectile.Damage;
-        weaponObject.ProjectileColor = weaponDef.Projectile.Color.ToGodot();
+        weaponObject.ProjectileOrigin = weaponDef.Projectile.Transform?.ToGodot() ?? Transform3D.Identity;
+        weaponObject.NumProjectiles = weaponDef.NumProjectiles;
+        weaponObject.ShootDelay = weaponDef.ShootDelay;
+        if (weaponDef.Projectile is BulletProjectileProperties bulletProjectileProperties)
+        {
+            weaponObject.ProjectileColor = bulletProjectileProperties.Color.ToGodot();
+            weaponObject.ProjectileSpread = bulletProjectileProperties.Spread;
+        }
+
 
         return weaponObject;
     }

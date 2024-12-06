@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Linq;
 using Godot;
+using ModDemo.Game.Objects;
 using ModDemo.Json.Common.Extensions;
 using ModDemo.Json.Levels;
-using ModDemo.Mod.Objects;
 
 
 namespace ModDemo.Mod;
@@ -46,10 +45,28 @@ public static class LevelLoader
                     instance.Name = levelObj.Name;
                     instance.Transform = levelObj.Transform.ToGodot();
 
-                    if (instance is VehicleObject vehicleObject && levelObj.Tags.Contains("player"))
+                    if (instance is VehicleObject vehicleObject)
                     {
-                        vehicleObject.AddToGroup("vehicles");
-                        vehicleObject.ControlledByPlayer = true;
+                        if (levelObj.HasTag("player"))
+                        {
+                            vehicleObject.AddToGroup("vehicles");
+                            vehicleObject.ControlledByPlayer = true;
+                        }
+
+                        for (int i = 0; i < vehicleObject.WeaponSlots.Length; i++)
+                        {
+                            string slotTag = $"slot{i + 1}";
+                            if (levelObj.HasTag(slotTag))
+                            {
+                                string weaponId = levelObj.GetTagValue(slotTag);
+                                if (objectsCollection.TryGetObject(weaponId, out Node3D? weaponNode))
+                                {
+                                    var weaponObject = (WeaponObject)weaponNode;
+                                    weaponObject.Freeze = true;
+                                    vehicleObject.SetWeapon(i, weaponObject);
+                                }
+                            }
+                        }
                     }
                     // Add to level
                     levelNode.AddChild(instance);

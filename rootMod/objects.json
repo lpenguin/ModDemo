@@ -78,9 +78,18 @@
 		{
 			"id": "machotine",
 			"type": "weapon",
+			"shootDelay": 0.3,
+			"numProjectiles": 2,
 			"mesh": {
 				"render": {
 					"mesh": "machotine/machotine.obj"
+				},
+				"transform": {
+					"scale": {
+						"x": 0.7,
+						"y": 0.7,
+						"z": 0.7
+					}
 				}
 			},
 			"physics": {
@@ -88,16 +97,31 @@
 				"collider": {
 					"type": "box"
 				},
-				"mass": 1.0
+				"mass": 1.0,
+				"transform": {
+					"scale": {
+						"x": 0.7,
+						"y": 0.7,
+						"z": 0.7
+					}
+				}
 			},
 			"projectile": {
 				"type": "bullet",
+				"transform": {
+					"position": {
+						"x": -0.15,
+						"y": 0.3,
+						"z": 2.0
+					}
+				},
 				"damage": 10.0,
 				"color": {
 					"r": 1.0,
 					"g": 0.0,
 					"b": 0.0
-				}
+				},
+				"spread": 10
 			}
 		},
 		{

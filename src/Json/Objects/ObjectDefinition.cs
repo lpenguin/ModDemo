@@ -1,8 +1,13 @@
 ﻿using System.Text.Json.Serialization;
+using ModDemo.Json.Converter;
 
 namespace ModDemo.Json.Objects
 {
-    [JsonConverter(typeof(ObjectDefinitionConverter))]
+    [JsonDerivedTypeConverter("type")]
+    [JsonDerivedType("prop", typeof(PropDefinition))]
+    [JsonDerivedType("vehicle", typeof(VehicleDefinition))]
+    [JsonDerivedType("scene", typeof(SceneDefinition))]
+    [JsonDerivedType("weapon", typeof(WeaponDefinition))]
     public abstract class ObjectDefinition
     {
         [JsonPropertyName("id")]

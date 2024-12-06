@@ -1,5 +1,8 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using ModDemo.Json.Common;
+using ModDemo.Json.Converter;
 
 namespace ModDemo.Json.Objects
 {
@@ -13,18 +16,35 @@ namespace ModDemo.Json.Objects
 
         [JsonPropertyName("projectile")]
         public ProjectileProperties Projectile { get; set; }
+
+        [JsonPropertyName("numProjectiles")]
+        public int NumProjectiles { get; set; } = 1;
+        
+        [JsonPropertyName("shootDelay")]
+        public float ShootDelay { get; set; }
     }
 
-    public class ProjectileProperties
+    [JsonDerivedTypeConverter("type")]
+    [JsonDerivedType("bullet", typeof(BulletProjectileProperties))]
+    public abstract class ProjectileProperties
     {
         [JsonPropertyName("type")]
         public ProjectileType Type { get; set; }
 
         [JsonPropertyName("damage")]
         public float Damage { get; set; }
+        
+        [JsonPropertyName("transform")]
+        public Transform? Transform { get; set; }
+        }
 
+    public class BulletProjectileProperties : ProjectileProperties
+    {
         [JsonPropertyName("color")]
-        public Color Color { get; set; }
+        public Color Color { get; set; } = new Color();
+        
+        [JsonPropertyName("spread")]
+        public float Spread { get; set; }
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]

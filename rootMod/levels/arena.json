@@ -29,7 +29,7 @@
   }, {
 	"name": "om1",
 	"objectId": "oxidized_monk",
-    "tags": ["player"],
+    "tags": {"player": "true", "slot1": "machotine"},
 	"transform": {
 		"position": {
 			"x": -1,

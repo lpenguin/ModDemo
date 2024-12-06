@@ -1,7 +1,8 @@
 ﻿using Godot;
+using Godot.Collections;
 using ModDemo.Core;
 
-namespace ModDemo.Mod.Objects;
+namespace ModDemo.Game.Objects;
 
 public enum GearState
 {
@@ -11,6 +12,8 @@ public enum GearState
 
 public partial class VehicleObject : VehicleBody3D
 {
+    public const string SignalNameVehiclePossessed = "VehiclePossessed"; 
+
     [Export] public float MaxBrakeForce { get; set; }
     [Export] public float MaxSteeringAngle { get; set; }
     [Export] public float MaxEngineForce { get; set; } = 100.0f;
@@ -21,21 +24,19 @@ public partial class VehicleObject : VehicleBody3D
     private const float VELOCITY_THRESHOLD = 0.5f;
     private GearState currentGear = GearState.Forward;
     private float currentSteering = 0.0f;
+    private Dictionary<int, WeaponObject> _weapons = new();
 
     public override void _Ready()
     {
-        base._Ready();
-        // Add to vehicles group for camera to find
         AddToGroup("vehicles");
         if (ControlledByPlayer)
         {
-            SignalBus.DispatchSignal("VehiclePossessed", this);
+            SignalBus.DispatchSignal(SignalNameVehiclePossessed, this);
         }
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        base._PhysicsProcess(delta);
         if (!ControlledByPlayer) return;
         
         bool isNearlyStopped = LinearVelocity.Length() < VELOCITY_THRESHOLD;
@@ -96,5 +97,25 @@ public partial class VehicleObject : VehicleBody3D
         // Smooth steering transition
         currentSteering = Mathf.MoveToward(currentSteering, targetSteering, SteeringSpeed * (float)delta);
         Steering = currentSteering;
+
+        if (Input.IsActionJustPressed("shoot"))
+        {
+            foreach (var weaponObject in _weapons.Values)
+            {
+                weaponObject.Shoot();
+            }
+        }
+    }
+
+    public void SetWeapon(int slot, WeaponObject weapon)
+    {
+        if (_weapons.TryGetValue(slot, out WeaponObject? oldWeapon))
+        {
+            RemoveChild(oldWeapon);
+            oldWeapon.QueueFree();
+        }
+        AddChild(weapon);
+        weapon.Position = WeaponSlots[slot];
+        _weapons[slot] = weapon;
     }
 }

@@ -210,34 +210,67 @@
         }
       }
     },
+    "bulletProjectile": {
+      "type": "object",
+      "required": ["color", "spread"],
+      "properties": {
+        "color": {
+          "$ref": "#/$defs/color",
+          "description": "Color of the bullet projectile (RGB values from 0 to 1)"
+        },
+        "spread": {
+          "type": "number",
+          "description": "Spread angle of the bullet in degrees"
+        }
+      }
+    },
+    "projectile": {
+      "type": "object",
+      "required": ["type", "damage"],
+      "properties": {
+        "transform": { "$ref": "#/$defs/transform" },
+        "type": {
+          "type": "string",
+          "enum": ["bullet"],
+          "description": "Type of projectile"
+        },
+        "damage": {
+          "type": "number",
+          "description": "Amount of damage dealt by the projectile"
+        }
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "properties": { "type": { "const": "bullet" } },
+              "allOf": [{ "$ref": "#/$defs/bulletProjectile" }]
+            }
+          ]
+        }
+      ]
+    },
     "weaponObject": {
       "type": "object",
       "required": ["mesh", "physics", "projectile"],
       "properties": {
         "mesh": { "$ref": "#/$defs/meshProperties" },
         "physics": { "$ref": "#/$defs/physics" },
-        "projectile": {
-          "type": "object",
-          "required": ["type", "damage", "color"],
-          "properties": {
-            "type": {
-              "type": "string",
-              "enum": ["bullet"],
-              "description": "Type of projectile"
-            },
-            "damage": {
-              "type": "number",
-              "description": "Amount of damage dealt by the projectile"
-            },
-            "color": {
-              "$ref": "#/$defs/color",
-              "description": "Color of the projectile (RGB values from 0 to 1)"
-            }
-          }
+        "projectile": { "$ref": "#/$defs/projectile" },
+        "numProjectiles": {
+          "type": "number",
+          "description": "Number of projectiles fired per shot",
+          "default": 1,
+          "minimum": 1
+        },
+        "shootDelay": {
+          "type": "number",
+          "description": "Delay between shots in seconds",
+          "default": 0.5,
+          "minimum": 0
         }
       }
     },
-    
     "boxColliderObject": {
       "type": "object",
       "required": [],
@@ -246,7 +279,6 @@
         "size": { "$ref": "#/$defs/vector3" }
       }
     },
-
     "meshColliderObject": {
       "type": "object",
       "required": ["mesh"],
