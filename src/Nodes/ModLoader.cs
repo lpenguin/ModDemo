@@ -12,14 +12,14 @@ namespace ModDemo.Nodes;
 public partial class ModLoader: Node3D
 {
 	[Export(PropertyHint.Dir)]
-	private string modDirectory = "res://rootMod";
+	public string ModDirectory { get; set; } = "res://rootMod";
 	
 	private ObjectsCollection _objects;
 	private List<Level> _levels;
 
 	public override void _Ready()
 	{
-		_objects = ObjectsLoader.Load(modDirectory);
+		_objects = ObjectsLoader.Load(ModDirectory);
 		_levels = LoadLevels();
 	}
 
@@ -39,7 +39,7 @@ public partial class ModLoader: Node3D
 	
 	private List<Level> LoadLevels()
 	{
-		var levelsDirectory = GodotPath.Combine(modDirectory, "levels");
+		var levelsDirectory = GodotPath.Combine(ModDirectory, "levels");
 		var levelPaths = GodotPath.GetFilesInDirectory(levelsDirectory);
 		var levels = new List<Level>();
 

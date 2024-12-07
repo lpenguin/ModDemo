@@ -16,6 +16,10 @@ public class ObjectsCollection
     {
         return _objects[id];
     }
+    public IReadOnlyDictionary<string, Node3D> GetAllObjects()
+    {
+        return _objects;
+    }
 
     public bool TryGetObject(string id, out Node3D? obj)
     {
