@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using Godot;
+using ModDemo.Editor;
 using ModDemo.Game.Objects;
-using ModDemo.Json.Common;
 using ModDemo.Json.Common.Extensions;
 using ModDemo.Json.Objects;
 using ModDemo.Util;
@@ -11,24 +11,26 @@ using Vector3 = Godot.Vector3;
 
 namespace ModDemo.Mod;
 
-public static class ObjectsLoader
+public class ObjectsLoader
 {
-    private const string ObjectsFile = "objects.json";
-    private const string ObjectsFolder = "objects/";
+    private readonly Mod _mod;
 
-    public static ObjectsCollection Load(string modDirectory)
+    public ObjectsLoader(Mod mod)
     {
-        string file = GodotPath.Combine(modDirectory, ObjectsFile);
-        ObjectsContainer container = ObjectsReader.LoadFromFile(file);
-        ObjectsCollection collection = new ObjectsCollection();
-        foreach (ObjectDefinition objectDefinition in container.Objects)
+        _mod = mod;
+    }
+
+    public ObjectsCollection LoadObjects()
+    {
+        ObjectsCollection collection = new();
+        foreach (ObjectDefinition objectDefinition in _mod.ObjectDefinitions.Values)
         {
             Node3D node = objectDefinition switch
             {
-                PropDefinition propDef => ReadProp(propDef, modDirectory),
-                VehicleDefinition vehicleDef => ReadVehicle(vehicleDef, modDirectory),
-                SceneDefinition sceneDef => ReadScene(sceneDef, modDirectory),
-                WeaponDefinition weaponDef => ReadWeapon(weaponDef, modDirectory),
+                PropDefinition propDef => ReadProp(propDef),
+                VehicleDefinition vehicleDef => ReadVehicle(vehicleDef),
+                SceneDefinition sceneDef => ReadScene(sceneDef),
+                WeaponDefinition weaponDef => ReadWeapon(weaponDef),
                 EmptyDefinition => ReadEmpty(),
                 _ => throw new NotImplementedException()
             };
@@ -37,7 +39,7 @@ public static class ObjectsLoader
             {
                 node.AddChild(new ScriptNode
                 {
-                    Script = ReadScript(modDirectory, objectDefinition.Script),
+                    Script = ReadScript(objectDefinition.Script),
                 });
             }
 
@@ -52,17 +54,15 @@ public static class ObjectsLoader
         return new Node3D();
     }
 
-    private static string ReadScript(string modDirectory, string script)
+    private string ReadScript(string script)
     {
-        return GodotFile.ReadAllText(GodotPath.Combine(modDirectory, ObjectsFolder, script));
+        return GodotFile.ReadAllText(_mod.GetResourcePath(script));
     }
 
-    private static Node3D ReadWeapon(WeaponDefinition weaponDef, string modDirectory)
+    private Node3D ReadWeapon(WeaponDefinition weaponDef)
     {
-        
-    
         // Load and add mesh
-        Node3D mesh = LoadMesh(weaponDef.Mesh, modDirectory);
+        Node3D mesh = LoadMesh(weaponDef.Mesh);
     
         // Handle physics if specified
         Node3D physicsNode = weaponDef.Physics.Type switch
@@ -73,14 +73,7 @@ public static class ObjectsLoader
         };
 
         // Create appropriate shape based on collider type
-        CollisionShape3D collisionShape = weaponDef.Physics.Collider switch
-        {
-            BoxColliderProperties boxColliderProperties => CreateBoxCollider(GetAabb(mesh), boxColliderProperties),
-            MeshColliderProperties meshColliderProperties => CreateMeshCollider(meshColliderProperties, modDirectory),
-            _ => throw new NotSupportedException($"Unsupported collider type: {weaponDef.Physics.Collider}")
-        };
-        collisionShape.Name = "CollisionShape";
-        physicsNode.AddChild(collisionShape);
+        physicsNode.AddChild(CreateCollisionShape(weaponDef.Physics, mesh));
         physicsNode.AddChild(mesh);
         
 
@@ -102,10 +95,10 @@ public static class ObjectsLoader
         return weaponObject;
     }
 
-    private static Node3D ReadProp(PropDefinition propDef, string modDirectory)
+    private Node3D ReadProp(PropDefinition propDef)
     {
         Node3D result;
-        Node3D mesh = LoadMesh(propDef.Mesh, modDirectory);
+        Node3D mesh = LoadMesh(propDef.Mesh);
         
         if (propDef.Physics != null)
         {
@@ -117,13 +110,7 @@ public static class ObjectsLoader
             };
 
             // Create appropriate shape based on collider type
-            CollisionShape3D collisionShape = propDef.Physics.Collider switch
-            {
-                BoxColliderProperties boxColliderProperties => CreateBoxCollider(GetAabb(mesh), boxColliderProperties),
-                MeshColliderProperties meshColliderProperties => CreateMeshCollider(meshColliderProperties, modDirectory),
-                _ => throw new NotSupportedException($"Unsupported collider type: {propDef.Physics.Collider}")
-            };
-            collisionShape.Name = "CollisionShape";
+            var collisionShape = CreateCollisionShape(propDef.Physics, mesh);
             result.AddChild(collisionShape);
         }
         else
@@ -136,7 +123,179 @@ public static class ObjectsLoader
         return result;
     }
 
-    private static CollisionShape3D CreateBoxCollider(Aabb aabb, BoxColliderProperties properties)
+    public CollisionShape3D CreateCollisionShape(PhysicsProperties physicsDef, Node3D mesh)
+    {
+        CollisionShape3D collisionShape = physicsDef.Collider switch
+        {
+            BoxColliderProperties boxColliderProperties => CreateBoxCollider(GetAabb(mesh), boxColliderProperties),
+            MeshColliderProperties meshColliderProperties => CreateMeshCollider(meshColliderProperties),
+            _ => throw new NotSupportedException($"Unsupported collider type: {physicsDef.Collider}")
+        };
+        collisionShape.Name = "CollisionShape";
+        return collisionShape;
+    }
+
+    public Node3D LoadMesh(MeshProperties meshProperties)
+    {
+        RenderProperties renderProperties = meshProperties.Render;
+        var resource = _mod.LoadResource(meshProperties.Render.Mesh);
+        Node3D result;
+        if (resource is Mesh mesh)
+        {
+            MeshInstance3D meshInstance = new MeshInstance3D();
+            meshInstance.Mesh = mesh;
+
+            if (renderProperties.Texture != null)
+            {
+                var texture = _mod.LoadResource<Texture2D>(renderProperties.Texture);
+
+                if (texture != null)
+                {
+                    var material = new StandardMaterial3D();
+                    material.AlbedoTexture = texture;
+                    meshInstance.MaterialOverride = material;
+                }
+            }
+
+            result = meshInstance;
+        }
+        else if (resource is PackedScene packedScene)
+        {
+            result = packedScene.Instantiate<Node3D>();
+        }
+        else
+        {
+            throw new NotImplementedException();
+        }
+
+        if (meshProperties.Transform != null)
+        {
+            result.Transform = meshProperties.Transform.ToGodot();
+        }
+
+        return result;
+    }
+    private VehicleObject ReadVehicle(VehicleDefinition vehicleDef)
+    {
+        var vehicleObject = new VehicleObject();
+
+        Node3D visualInstance = LoadMesh(vehicleDef.Mesh);
+        vehicleObject.AddChild(visualInstance);
+        
+        // Set up vehicle properties
+        vehicleObject.MaxEngineForce = vehicleDef.Vehicle.EngineForce;
+        vehicleObject.MaxBrakeForce = vehicleDef.Vehicle.BrakeForce;
+        vehicleObject.MaxSteeringAngle = vehicleDef.Vehicle.SteeringAngle;
+        vehicleObject.WeaponSlots = vehicleDef.WeaponSlots.Select(v => v.ToGodot()).ToArray();
+
+        vehicleObject.AddChild(CreateCollisionShape(vehicleDef.Physics, visualInstance));
+
+        // Set up physics properties
+        if (vehicleDef.Physics != null)
+        {
+            vehicleObject.Mass = vehicleDef.Physics.Mass;
+        }
+
+        // Set up wheels
+        foreach (var wheelDef in vehicleDef.Wheels)
+        {
+            var wheel = new VehicleWheel3D();
+            wheel.UseAsTraction = wheelDef.UseAsTraction;
+            wheel.UseAsSteering = wheelDef.UseAsSteering;
+
+            wheel.Transform = wheelDef.Transform.ToGodot();
+            wheel.AddChild(LoadMesh(wheelDef.Mesh));
+            vehicleObject.AddChild(wheel);
+        }
+
+        return vehicleObject;
+    }
+
+    private Node3D ReadScene(SceneDefinition sceneDef)
+    {
+        var scene = _mod.LoadResource<PackedScene>(sceneDef.File);
+        if (scene == null)
+        {
+            throw new FileNotFoundException($"Scene not found: {sceneDef.File}");
+        }
+        return scene.Instantiate<Node3D>();
+    }
+
+    public static Aabb GetAabb(Node3D visualInstance)
+    {
+        if (visualInstance is MeshInstance3D { Mesh: not null } meshInstance)
+        {
+            return GetAabb(meshInstance);
+        }
+        
+        Aabb combinedAabb = new Aabb();
+        bool first = true;
+        
+        foreach (Node child in visualInstance.GetChildren())
+        {
+            if (child is not MeshInstance3D childMeshInstance || childMeshInstance.Mesh == null)
+                continue;
+
+            Aabb childAabb = GetAabb(childMeshInstance);
+            
+            if (first)
+            {
+                combinedAabb = childAabb;
+                first = false;
+            }
+            else
+            {
+                combinedAabb = combinedAabb.Merge(childAabb);
+            }
+        }
+        
+        return combinedAabb;
+    }
+
+    private static Aabb GetAabb(MeshInstance3D meshInstance)
+    {
+        var aabb = meshInstance.Mesh.GetAabb();
+        aabb.Size *= meshInstance.Scale;
+        aabb.Position *= meshInstance.Scale;
+        aabb.Position += meshInstance.Position;
+        return aabb;
+    }
+
+    private CollisionShape3D CreateMeshCollider(MeshColliderProperties properties)
+    {
+        var collisionShape = new CollisionShape3D();
+    
+        // Load the collision mesh
+        var collisionMesh = _mod.LoadResource<Mesh>(properties.Mesh);
+    
+        if (collisionMesh == null)
+        {
+            throw new FileNotFoundException($"Collision mesh not found: {properties.Mesh}");
+        }
+    
+        // Create concave polygon shape from mesh
+        var shape = new ConcavePolygonShape3D();
+        shape.Data = collisionMesh.GetFaces(); // Get triangles from mesh
+    
+        collisionShape.Shape = shape;
+    
+        // Apply transform from properties
+        if (properties.Transform != null)
+        {
+            if (properties.Transform.Position != null)
+                collisionShape.Position = properties.Transform.Position.ToGodot();
+         
+            if (properties.Transform.Rotation != null)
+                collisionShape.Rotation = properties.Transform.Rotation.ToGodot();
+         
+            if (properties.Transform.Scale != null)
+                collisionShape.Scale = properties.Transform.Scale.ToGodot();
+        }
+    
+        return collisionShape;
+    }
+
+    public static CollisionShape3D CreateBoxCollider(Aabb aabb, BoxColliderProperties properties)
     {
         var collisionShape = new CollisionShape3D();
     
@@ -179,174 +338,42 @@ public static class ObjectsLoader
 
         return collisionShape;
     }
-    private static CollisionShape3D CreateMeshCollider(MeshColliderProperties properties, string modFolder)
+    
+    public LevelEditorObject LoadLevelEditorObject(ObjectDefinition definition)
     {
-        var collisionShape = new CollisionShape3D();
-    
-        // Load the collision mesh
-        string meshPath = GodotPath.Combine(modFolder, ObjectsFolder, properties.Mesh);
-        var collisionMesh = ResourceLoader.Load<Mesh>(meshPath);
-    
-        if (collisionMesh == null)
+        MeshProperties? meshProperties = definition switch
         {
-            throw new FileNotFoundException($"Collision mesh not found: {meshPath}");
-        }
-    
-        // Create concave polygon shape from mesh
-        var shape = new ConcavePolygonShape3D();
-        shape.Data = collisionMesh.GetFaces(); // Get triangles from mesh
-    
-        collisionShape.Shape = shape;
-    
-        // Apply transform from properties
-        if (properties.Transform != null)
-        {
-            if (properties.Transform.Position != null)
-                collisionShape.Position = properties.Transform.Position.ToGodot();
-         
-            if (properties.Transform.Rotation != null)
-                collisionShape.Rotation = properties.Transform.Rotation.ToGodot();
-         
-            if (properties.Transform.Scale != null)
-                collisionShape.Scale = properties.Transform.Scale.ToGodot();
-        }
-    
-        return collisionShape;
-    }
-
-    private static Node3D LoadMesh(MeshProperties meshProperties, string modDirectory)
-    {
-        RenderProperties renderProperties = meshProperties.Render;
-        string path = GodotPath.Combine(modDirectory, ObjectsFolder, renderProperties.Mesh);
-        var resource = ResourceLoader.Load(path);
-        Node3D result;
-        if (resource is Mesh mesh)
-        {
-            MeshInstance3D meshInstance = new MeshInstance3D();
-            meshInstance.Mesh = mesh;
-
-            if (renderProperties.Texture != null)
-            {
-                string texturePath = GodotPath.Combine(modDirectory, ObjectsFolder, renderProperties.Texture);
-                var texture = ResourceLoader.Load<Texture2D>(texturePath);
-
-                if (texture != null)
-                {
-                    var material = new StandardMaterial3D();
-                    material.AlbedoTexture = texture;
-                    meshInstance.MaterialOverride = material;
-                }
-            }
-
-            result = meshInstance;
-        }
-        else if (resource is PackedScene packedScene)
-        {
-            result = packedScene.Instantiate<Node3D>();
-        }
-        else
-        {
-            throw new NotImplementedException();
-        }
-
-        if (meshProperties.Transform != null)
-        {
-            result.Transform = meshProperties.Transform.ToGodot();
-        }
-
-        return result;
-    }
-    private static VehicleObject ReadVehicle(VehicleDefinition vehicleDef, string modDirectory)
-    {
-        var vehicleObject = new VehicleObject();
-
-        Node3D visualInstance = LoadMesh(vehicleDef.Mesh, modDirectory);
-        vehicleObject.AddChild(visualInstance);
-        
-        // Set up vehicle properties
-        vehicleObject.MaxEngineForce = vehicleDef.Vehicle.EngineForce;
-        vehicleObject.MaxBrakeForce = vehicleDef.Vehicle.BrakeForce;
-        vehicleObject.MaxSteeringAngle = vehicleDef.Vehicle.SteeringAngle;
-        vehicleObject.WeaponSlots = vehicleDef.WeaponSlots.Select(v => v.ToGodot()).ToArray();
-
-        CollisionShape3D collisionShape = vehicleDef.Physics.Collider switch
-        {
-            // TODO:
-            BoxColliderProperties boxColliderProperties => CreateBoxCollider(GetAabb(visualInstance), boxColliderProperties),
-            MeshColliderProperties meshColliderProperties => CreateMeshCollider(meshColliderProperties, modDirectory),
-            _ => throw new NotSupportedException($"Unsupported collider type: {vehicleDef.Physics.Collider}")
+            PropDefinition prop => prop.Mesh,
+            VehicleDefinition vehicle => vehicle.Mesh,
+            WeaponDefinition weapon => weapon.Mesh,
+            _ => null
         };
-        vehicleObject.AddChild(collisionShape);
 
-        // Set up physics properties
-        if (vehicleDef.Physics != null)
+        var editorObject = new LevelEditorObject(definition.Id);
+        if (meshProperties == null)
         {
-            vehicleObject.Mass = vehicleDef.Physics.Mass;
+            return editorObject;
         }
 
-        // Set up wheels
-        foreach (var wheelDef in vehicleDef.Wheels)
+        var visualInstance = LoadMesh(meshProperties);  
+        editorObject.AddChild(visualInstance);
+        PhysicsProperties? physicsProperties = definition switch
         {
-            var wheel = new VehicleWheel3D();
-            wheel.UseAsTraction = wheelDef.UseAsTraction;
-            wheel.UseAsSteering = wheelDef.UseAsSteering;
+            PropDefinition prop => prop.Physics,
+            VehicleDefinition vehicle => vehicle.Physics,
+            WeaponDefinition weapon => weapon.Physics,
+            _ => null
+        };
 
-            wheel.Transform = wheelDef.Transform.ToGodot();
-            wheel.AddChild(LoadMesh(wheelDef.Mesh, modDirectory));
-            vehicleObject.AddChild(wheel);
+        if (physicsProperties == null)
+        {
+            return editorObject;
         }
 
-        return vehicleObject;
-    }
-
-    private static Node3D ReadScene(SceneDefinition sceneDef, string modDirectory)
-    {
-        string scenePath = GodotPath.Combine(modDirectory, "objects", sceneDef.File);
-        var scene = ResourceLoader.Load<PackedScene>(scenePath);
-        if (scene == null)
-        {
-            throw new FileNotFoundException($"Scene not found: {scenePath}");
-        }
-        return scene.Instantiate<Node3D>();
-    }
-
-    private static Aabb GetAabb(Node3D visualInstance)
-    {
-        if (visualInstance is MeshInstance3D { Mesh: not null } meshInstance)
-        {
-            return GetAabb(meshInstance);
-        }
-        
-        Aabb combinedAabb = new Aabb();
-        bool first = true;
-        
-        foreach (Node child in visualInstance.GetChildren())
-        {
-            if (child is not MeshInstance3D childMeshInstance || childMeshInstance.Mesh == null)
-                continue;
-
-            Aabb childAabb = GetAabb(childMeshInstance);
-            
-            if (first)
-            {
-                combinedAabb = childAabb;
-                first = false;
-            }
-            else
-            {
-                combinedAabb = combinedAabb.Merge(childAabb);
-            }
-        }
-        
-        return combinedAabb;
-    }
-
-    private static Aabb GetAabb(MeshInstance3D meshInstance)
-    {
-        var aabb = meshInstance.Mesh.GetAabb();
-        aabb.Size *= meshInstance.Scale;
-        aabb.Position *= meshInstance.Scale;
-        aabb.Position += meshInstance.Position;
-        return aabb;
+        var collider = CreateCollisionShape(physicsProperties, visualInstance);
+        var area3d = new Area3D();
+        area3d.AddChild(collider);
+        editorObject.AddChild(area3d);
+        return editorObject;
     }
 }

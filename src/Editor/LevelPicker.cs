@@ -1,5 +1,6 @@
 ﻿using Godot;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using ModDemo.Util;
 
@@ -10,7 +11,7 @@ namespace ModDemo.Editor
         private ItemList _levelsList;
         private Button _loadButton;
         private Button _cancelButton;
-        private string _modDirectory;
+        private Mod.Mod _mod;
 
         [Signal]
         public delegate void LevelSelectedEventHandler(string levelName);
@@ -34,9 +35,9 @@ namespace ModDemo.Editor
             VisibilityChanged += OnVisibilityChanged;
         }
 
-        public void Initialize(string modDirectory)
+        public void Initialize(Mod.Mod mod)
         {
-            _modDirectory = modDirectory;
+            _mod = mod;
         }
 
         private void OnVisibilityChanged()
@@ -51,11 +52,8 @@ namespace ModDemo.Editor
         {
             _levelsList.Clear();
             
-            var levelsPath = GodotPath.Combine(_modDirectory, "levels");
-            var levelFiles = GodotPath.GetFilesInDirectory(levelsPath);
-            foreach (var levelFile in levelFiles)
+            foreach (var levelName in _mod.LevelsNames)
             {
-                var levelName = Path.GetFileNameWithoutExtension(levelFile);
                 _levelsList.AddItem(levelName);
             }
 

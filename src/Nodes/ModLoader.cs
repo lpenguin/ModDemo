@@ -19,7 +19,8 @@ public partial class ModLoader: Node3D
 
 	public override void _Ready()
 	{
-		_objects = ObjectsLoader.Load(ModDirectory);
+		var objectsLoader = new ObjectsLoader(new Mod.Mod(ModDirectory));
+		_objects = objectsLoader.LoadObjects();
 		_levels = LoadLevels();
 	}
 

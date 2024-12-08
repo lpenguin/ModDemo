@@ -1,40 +1,42 @@
-﻿using System.Collections.Generic;
-using Godot;
-using ModDemo.Game.Objects;
+﻿using Godot;
+using System.Collections.Generic;
+using ModDemo.Json.Objects;
 using ModDemo.Json.Levels;
-using ModDemo.Nodes;
 using ModDemo.Json.Common;
+using ModDemo.Json.Common.Extensions;
 using ModDemo.Mod;
+using ModDemo.Nodes;
 using ModDemo.Util;
-using Color = System.Drawing.Color;
 using Vector3 = Godot.Vector3;
 
 namespace ModDemo.Editor;
 
 public partial class LevelEditor : Control
 {
-    [Export] private NodePath modDirectoryPath;  // Path to mod directory in project settings
+    [Export(PropertyHint.Dir)]
+    public string modDirectory { get; set; } = "res://rootMod"; // Path to mod directory in project settings
     
-    private string _modDirectory;
-    private ObjectsCollection _objectsCollection;
+    private Mod.Mod _mod;
     private ItemList _objectsList;
     private Node3D _levelRoot;
     private Camera3D _editorCamera;
     private SubViewport _viewport;
-    private Node3D? _selectedObject;
+    private LevelEditorObject? _selectedObject;
     private string? _selectedObjectId;
     private Level? _currentLevel;
     private PackedScene _levelPickerScene;
     private LevelPicker _levelPicker;
+    private ObjectsLoader _objectsLoader;
 
     public override void _Ready()
     {
         // Get mod directory from export variable
-        _modDirectory = GodotPath.Combine("res://", "rootMod");
-        
+        _mod = new Mod.Mod(modDirectory);
+        _objectsLoader = new ObjectsLoader(_mod);
+
         _levelPickerScene = GD.Load<PackedScene>("res://levelEditor/level_picker.tscn");
         _levelPicker = _levelPickerScene.Instantiate<LevelPicker>();
-        _levelPicker.Initialize(_modDirectory);
+        _levelPicker.Initialize(_mod);
         _levelPicker.LevelSelected += OnLevelSelected;
         AddChild(_levelPicker);
 
@@ -57,9 +59,7 @@ public partial class LevelEditor : Control
         viewportContainer.MouseFilter = MouseFilterEnum.Pass;
         
         // Add editor camera with controls
-        _editorCamera = new CameraControls();
-        _editorCamera.Position = new Vector3(0, 5, 10);
-        _viewport.AddChild(_editorCamera);
+        _editorCamera = GetNode<Camera3D>("%EditorCamera");
         
         // Add grid for reference
         AddEditorGrid();
@@ -71,6 +71,7 @@ public partial class LevelEditor : Control
         GetNode<Button>("%NewLevel").Pressed += OnNewLevel;
         GetNode<Button>("%SaveLevel").Pressed += OnSaveLevel;
     }
+
     private void OnLevelSelected(string levelName)
     {
         LoadLevel(levelName);
@@ -78,13 +79,10 @@ public partial class LevelEditor : Control
 
     private void InitializeObjectsBrowser()
     {
-        // Get objects collection from mod directory
-        _objectsCollection = ObjectsLoader.Load(_modDirectory);
-        
-        // Populate objects list
-        foreach (var obj in _objectsCollection.GetAllObjects())
+
+        foreach (var (id, obj) in _mod.ObjectDefinitions)
         {
-            _objectsList.AddItem(obj.Key);
+            _objectsList.AddItem(id);
         }
         
         // Connect signals
@@ -102,13 +100,10 @@ public partial class LevelEditor : Control
             }
         }
 
-        // Construct level file path
-        var levelPath = GodotPath.Combine(_modDirectory, "levels", $"{levelName}.json");
-        
-        // Load level data
+        // Load level data from JSON
         try
         {
-            _currentLevel = LevelReader.LoadFromFile(levelPath);
+            _currentLevel = _mod.LoadLevel(levelName);
         }
         catch (System.Exception e)
         {
@@ -121,58 +116,29 @@ public partial class LevelEditor : Control
         // Create objects defined in the level
         foreach (var levelObject in _currentLevel.Objects)
         {
-            if (_objectsCollection.TryGetObject(levelObject.ObjectId, out Node3D? template))
+            if (_mod.ObjectDefinitions.TryGetValue(levelObject.ObjectId, out var definition))
             {
-                var instance = (Node3D)template.Duplicate();
-                
+                var editorObject = _objectsLoader.LoadLevelEditorObject(definition);
+
                 // Apply transform from level data
                 if (levelObject.Transform != null)
                 {
-                    if (levelObject.Transform.Position != null)
-                    {
-                        instance.Position = new Vector3(
-                            levelObject.Transform.Position.X,
-                            levelObject.Transform.Position.Y,
-                            levelObject.Transform.Position.Z
-                        );
-                    }
-                    
-                    if (levelObject.Transform.Rotation != null)
-                    {
-                        instance.Rotation = new Vector3(
-                            levelObject.Transform.Rotation.X,
-                            levelObject.Transform.Rotation.Y,
-                            levelObject.Transform.Rotation.Z
-                        );
-                    }
-                    
-                    if (levelObject.Transform.Scale != null)
-                    {
-                        instance.Scale = new Vector3(
-                            levelObject.Transform.Scale.X,
-                            levelObject.Transform.Scale.Y,
-                            levelObject.Transform.Scale.Z
-                        );
-                    }
+                    editorObject.Transform = levelObject.Transform.ToGodot();
                 }
 
-                // Store the original object ID for saving
-                instance.Name = levelObject.ObjectId;
-                
-                // Add to scene
-                _levelRoot.AddChild(instance);
-                
+                _levelRoot.AddChild(editorObject);
+                    
                 // Add label with object name if specified
                 if (!string.IsNullOrEmpty(levelObject.Name))
                 {
                     var label3D = new Label3D
                     {
                         Text = levelObject.Name,
-                        Position = instance.Position + Vector3.Up * 2,
+                        Position = editorObject.Position + Vector3.Up * 2,
                         Scale = new Vector3(0.5f, 0.5f, 0.5f),
                         Billboard = BaseMaterial3D.BillboardModeEnum.Enabled
                     };
-                    
+                        
                     _levelRoot.AddChild(label3D);
                 }
             }
@@ -184,36 +150,19 @@ public partial class LevelEditor : Control
         _selectedObjectId = _objectsList.GetItemText((int)index);
     }
 
-    private void SelectObject(Node3D obj)
+    private void SelectObject(LevelEditorObject obj)
     {
-        if (_selectedObject != null)
-        {
-            // Remove highlight from previously selected object
-            if (_selectedObject is MeshInstance3D prevMesh)
-            {
-                // Reset material or highlight
-            }
-        }
-
         _selectedObject = obj;
-
-        if (_selectedObject != null)
-        {
-            // Highlight new selected object
-            if (_selectedObject is MeshInstance3D newMesh)
-            {
-                // Add highlight material or effect
-            }
-        }
+        // TODO: Add visual selection feedback
     }
 
-    public override void _UnhandledInput(InputEvent @event)
+    public override void _Input(InputEvent @event)
     {
         if (@event is InputEventMouseButton mouseButton)
         {
             if (mouseButton.ButtonIndex == MouseButton.Left && mouseButton.Pressed)
             {
-                HandleLeftClick(mouseButton);
+                HandleLeftClick();
             }
             else if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed)
             {
@@ -222,9 +171,9 @@ public partial class LevelEditor : Control
         }
     }
 
-    private void HandleLeftClick(InputEventMouseButton mouseButton)
+    private void HandleLeftClick()
     {
-        if (_selectedObjectId == null) return;
+        if (_selectedObjectId == null || !_mod.ObjectDefinitions.ContainsKey(_selectedObjectId)) return;
 
         // Cast ray from camera to find placement position
         var mousePos = GetViewport().GetMousePosition();
@@ -233,6 +182,7 @@ public partial class LevelEditor : Control
         
         var spaceState = _viewport.World3D.DirectSpaceState;
         var query = PhysicsRayQueryParameters3D.Create(rayOrigin, rayEnd);
+        query.CollideWithAreas = true;
         var result = spaceState.IntersectRay(query);
         
         if (result.Count > 0)
@@ -244,19 +194,22 @@ public partial class LevelEditor : Control
 
     private void HandleRightClick(InputEventMouseButton mouseButton)
     {
-        // Cast ray for object selection
         var mousePos = GetViewport().GetMousePosition();
         var rayOrigin = _editorCamera.ProjectRayOrigin(mousePos);
         var rayEnd = rayOrigin + _editorCamera.ProjectRayNormal(mousePos) * 1000;
         
         var spaceState = _viewport.World3D.DirectSpaceState;
         var query = PhysicsRayQueryParameters3D.Create(rayOrigin, rayEnd);
+        query.CollideWithAreas = true;
         var result = spaceState.IntersectRay(query);
         
         if (result.Count > 0 && result.ContainsKey("collider"))
         {
-            var hitObject = (Node3D)result["collider"];
-            SelectObject(hitObject);
+            var hitObject = result["collider"].As<Node3D>();
+            if (hitObject.GetParent() is LevelEditorObject editorObject)
+            {
+                SelectObject(editorObject);
+            }
         }
         else
         {
@@ -266,11 +219,11 @@ public partial class LevelEditor : Control
     
     private void PlaceObject(string objectId, Vector3 position)
     {
-        if (_objectsCollection.TryGetObject(objectId, out Node3D? template))
+        if (_mod.ObjectDefinitions.TryGetValue(objectId, out var definition))
         {
-            var instance = (Node3D)template.Duplicate();
-            instance.Position = position;
-            _levelRoot.AddChild(instance);
+            var editorObject = _objectsLoader.LoadLevelEditorObject(definition);
+            editorObject.Position = position;
+            _levelRoot.AddChild(editorObject);
         }
     }
     
@@ -327,30 +280,30 @@ public partial class LevelEditor : Control
         _currentLevel.Objects.Clear();
         foreach (Node child in _levelRoot.GetChildren())
         {
-            if (child is Node3D node3D && child != _editorCamera && !(child is MeshInstance3D) && !(child is Label3D))
+            if (child is LevelEditorObject editorObject)
             {
                 var levelObject = new LevelObject
                 {
-                    ObjectId = node3D.Name, // You might want to store the original object ID somewhere
+                    ObjectId = editorObject.ObjectId,
                     Transform = new Transform
                     {
                         Position = new Json.Common.Vector3
                         {
-                            X = node3D.Position.X,
-                            Y = node3D.Position.Y,
-                            Z = node3D.Position.Z
+                            X = editorObject.Position.X,
+                            Y = editorObject.Position.Y,
+                            Z = editorObject.Position.Z
                         },
                         Rotation = new Json.Common.Vector3
                         {
-                            X = node3D.Rotation.X,
-                            Y = node3D.Rotation.Y,
-                            Z = node3D.Rotation.Z
+                            X = editorObject.Rotation.X,
+                            Y = editorObject.Rotation.Y,
+                            Z = editorObject.Rotation.Z
                         },
                         Scale = new Json.Common.Vector3
                         {
-                            X = node3D.Scale.X,
-                            Y = node3D.Scale.Y,
-                            Z = node3D.Scale.Z
+                            X = editorObject.Scale.X,
+                            Y = editorObject.Scale.Y,
+                            Z = editorObject.Scale.Z
                         }
                     }
                 };
@@ -359,6 +312,6 @@ public partial class LevelEditor : Control
         }
 
         // Save level to file
-        // You'll need to implement this part based on your save system
+        // TODO: Implement save dialog and file writing
     }
 }

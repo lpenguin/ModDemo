@@ -24,6 +24,7 @@ transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0342712, -0.0220642, -0.262624)
 shape = SubResource("BoxShape3D_itqek")
+debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="VehicleWheel3D" type="VehicleWheel3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.557982, -0.47783, 1.10114)

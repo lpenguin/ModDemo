@@ -1,10 +1,13 @@
-[gd_scene load_steps=7 format=3 uid="uid://ciljcdv4m8j5d"]
+[gd_scene load_steps=10 format=3 uid="uid://ciljcdv4m8j5d"]
 
 [ext_resource type="Script" uid="uid://dc4v31l7prkby" path="res://src/Nodes/ModLoader.cs" id="1_ejjg3"]
 [ext_resource type="PackedScene" uid="uid://h5iu7t5bvbhw" path="res://level_selector.tscn" id="2_5tjhw"]
 [ext_resource type="Script" uid="uid://b70cwe2qqy5km" path="res://src/Nodes/LevelSelector.cs" id="3_jqt42"]
 [ext_resource type="Script" uid="uid://b8dx5mnr2oeto" path="res://src/Nodes/VehicleCamera.cs" id="4_28aoi"]
 [ext_resource type="Script" uid="uid://cxlt2g23n5hdh" path="res://src/Core/SignalBus.cs" id="5_jnlp7"]
+[ext_resource type="PackedScene" uid="uid://b0n01jf62p2ym" path="res://objects/ui/mod_ui.tscn" id="6_vyht1"]
+[ext_resource type="Script" uid="uid://cxsfprnjja6uj" path="res://src/Nodes/KeyValuesStorage.cs" id="7_bf3um"]
+[ext_resource type="Script" uid="uid://bia7e1kvv2weu" path="res://src/Nodes/EffectManager.cs" id="8_bf3um"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_o3drw"]
 size = Vector3(2.61443, 2.38083, 5.14368)
@@ -14,6 +17,9 @@ size = Vector3(2.61443, 2.38083, 5.14368)
 [node name="Mod Loader" type="Node3D" parent="."]
 script = ExtResource("1_ejjg3")
 
+[node name="ModUi" parent="." instance=ExtResource("6_vyht1")]
+mouse_filter = 2
+
 [node name="Level Selector" parent="." instance=ExtResource("2_5tjhw")]
 offset_right = -1012.0
 script = ExtResource("3_jqt42")
@@ -22,9 +28,7 @@ modLoaderNodePath = NodePath("../Mod Loader")
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.725747, 0.687962, 0, -0.687962, 0.725747, 0, 5.00649, 5.13869)
 script = ExtResource("4_28aoi")
-RotationSpeed = 0.3
 PositionSmoothSpeed = 20.0
-RotationSmoothSpeed = 20.0
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.435718, 0.900083, 0, -0.900083, 0.435718, 0, 2.49164, 0)
@@ -36,7 +40,16 @@ shadow_enabled = true
 [node name="CollisionShape3D" type="CollisionShape3D" parent="VehicleBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.142647, 0.0506744, -0.433411)
 shape = SubResource("BoxShape3D_o3drw")
+debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="Signal Bus" type="Node" parent="."]
 script = ExtResource("5_jnlp7")
 metadata/_custom_type_script = ExtResource("5_jnlp7")
+
+[node name="KeyValuesStorage" type="Node" parent="."]
+script = ExtResource("7_bf3um")
+metadata/_custom_type_script = ExtResource("7_bf3um")
+
+[node name="EffectManager" type="Node" parent="."]
+script = ExtResource("8_bf3um")
+metadata/_custom_type_script = ExtResource("8_bf3um")

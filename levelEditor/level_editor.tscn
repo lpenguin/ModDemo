@@ -1,6 +1,14 @@
-[gd_scene load_steps=2 format=3 uid="uid://bqxic1nptd5jl"]
+[gd_scene load_steps=6 format=3 uid="uid://bqxic1nptd5jl"]
 
 [ext_resource type="Script" uid="uid://cfriu0egdk2j6" path="res://src/Editor/LevelEditor.cs" id="1_pww3k"]
+[ext_resource type="Script" uid="uid://cxwt33vwksrc0" path="res://src/Nodes/CameraControls.cs" id="2_pww3k"]
+
+[sub_resource type="Environment" id="Environment_pww3k"]
+
+[sub_resource type="World3D" id="World3D_20y6c"]
+environment = SubResource("Environment_pww3k")
+
+[sub_resource type="BoxMesh" id="BoxMesh_yrsov"]
 
 [node name="LevelEditor" type="Control"]
 layout_mode = 3
@@ -43,6 +51,7 @@ text = "Load Level"
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
+split_offset = -875
 
 [node name="Objects Browser" type="Panel" parent="HBoxContainer/HSplitContainer"]
 custom_minimum_size = Vector2(120, 0)
@@ -73,12 +82,25 @@ item_1/text = "asadasd"
 [node name="ViewportContainer" type="SubViewportContainer" parent="HBoxContainer/HSplitContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 2
 stretch = true
 
 [node name="EditorViewport" type="SubViewport" parent="HBoxContainer/HSplitContainer/ViewportContainer"]
 unique_name_in_owner = true
+world_3d = SubResource("World3D_20y6c")
 handle_input_locally = false
 physics_object_picking = true
-size = Vector2i(2, 613)
+size = Vector2i(1020, 613)
 render_target_update_mode = 4
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="HBoxContainer/HSplitContainer/ViewportContainer/EditorViewport"]
+mesh = SubResource("BoxMesh_yrsov")
+
+[node name="EditorCamera" type="Camera3D" parent="HBoxContainer/HSplitContainer/ViewportContainer/EditorViewport"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15.636)
+script = ExtResource("2_pww3k")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="HBoxContainer/HSplitContainer/ViewportContainer/EditorViewport"]
+transform = Transform3D(1, 0, 0, 0, 0.69121, 0.722654, 0, -0.722654, 0.69121, 0, 4.8371, 0)
