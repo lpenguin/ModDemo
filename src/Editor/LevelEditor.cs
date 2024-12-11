@@ -199,6 +199,11 @@ public partial class LevelEditor : Control
                     editorObject.Transform = levelObject.Transform.ToGodot();
                 }
 
+                if (levelObject.Tags != null)
+                {
+                    editorObject.Tags = levelObject.Tags;
+                }
+
                 _levelRoot.AddChild(editorObject);
             }
         }
@@ -249,6 +254,7 @@ public partial class LevelEditor : Control
                 var levelObject = new LevelObject
                 {
                     ObjectId = editorObject.ObjectId,
+                    Tags = editorObject.Tags,
                     Transform = new Transform
                     {
                         Position = new Json.Common.Vector3

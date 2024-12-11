@@ -20,7 +20,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -40,7 +41,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -60,7 +62,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -80,7 +83,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -100,7 +104,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -120,7 +125,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -140,7 +146,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -160,7 +167,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "oxidized_monk",
@@ -180,6 +188,10 @@
           "y": 0,
           "z": 0
         }
+      },
+      "tags": {
+        "player": "true",
+        "slot1": "machotine"
       }
     },
     {
@@ -200,7 +212,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -220,7 +233,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -240,7 +254,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -260,7 +275,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -280,7 +296,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -300,7 +317,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -320,7 +338,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -340,7 +359,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -360,7 +380,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -380,7 +401,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -400,7 +422,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -420,27 +443,8 @@
           "y": 0,
           "z": 0
         }
-      }
-    },
-    {
-      "objectId": "mushroom",
-      "transform": {
-        "position": {
-          "x": 50.009518,
-          "y": -5.9465656,
-          "z": -4.7140827
-        },
-        "scale": {
-          "x": 1,
-          "y": 1,
-          "z": 1
-        },
-        "rotation": {
-          "x": -0,
-          "y": 0,
-          "z": 0
-        }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "arena",
@@ -460,7 +464,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -480,7 +485,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     },
     {
       "objectId": "mushroom",
@@ -500,7 +506,8 @@
           "y": 0,
           "z": 0
         }
-      }
+      },
+      "tags": {}
     }
   ]
 }

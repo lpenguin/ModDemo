@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿using System.Collections.Generic;
+using Godot;
 
 namespace ModDemo.Editor;
 
@@ -12,6 +13,7 @@ public partial class PropertiesController : Node
     private LineEdit _rxEdit;
     private LineEdit _ryEdit;
     private LineEdit _rzEdit;
+    private LineEdit _tagsTextEdit;
     private LevelEditorObject? _selectedObject;
     private bool _updatingUI;
 
@@ -26,6 +28,8 @@ public partial class PropertiesController : Node
         _rxEdit = GetNode<LineEdit>("%RXLineEdit");
         _ryEdit = GetNode<LineEdit>("%RYLineEdit");
         _rzEdit = GetNode<LineEdit>("%RZLineEdit");
+        _tagsTextEdit = GetNode<LineEdit>("%TagsEdit");
+        _tagsTextEdit.TextChanged += OnTagsTextChanged;
 
         // Connect UI signals
         _nameEdit.TextChanged += OnNameChanged;
@@ -39,6 +43,33 @@ public partial class PropertiesController : Node
         // Initialize UI state
         ClearFields();
         DisableFields();
+    }
+
+    private void OnTagsTextChanged(string text)
+    {
+        if (_selectedObject == null) return;
+        
+        var tags = new Dictionary<string, string>();
+        var lines = _tagsTextEdit.Text.Split('\n');
+        
+        foreach (var line in lines)
+        {
+            var trimmedLine = line.Trim();
+            if (string.IsNullOrEmpty(trimmedLine)) continue;
+            
+            var parts = trimmedLine.Split('=', 2);
+            if (parts.Length == 2)
+            {
+                var key = parts[0].Trim();
+                var value = parts[1].Trim();
+                if (!string.IsNullOrEmpty(key))
+                {
+                    tags[key] = value;
+                }
+            }
+        }
+        
+        _selectedObject.Tags = tags;
     }
 
     public void SetSelectedObject(LevelEditorObject? obj)
@@ -90,6 +121,7 @@ public partial class PropertiesController : Node
         _updatingUI = true;
         _idEdit.Text = "";
         _nameEdit.Text = "";
+        _tagsTextEdit.Text = "";
         _xEdit.Text = "0";
         _yEdit.Text = "0";
         _zEdit.Text = "0";
@@ -111,6 +143,13 @@ public partial class PropertiesController : Node
 
         // Update transform
         UpdateTransformFields();
+        var tagsText = new System.Text.StringBuilder();
+        foreach (var tag in _selectedObject.Tags)
+        {
+            tagsText.AppendLine($"{tag.Key}={tag.Value}");
+        }
+        _tagsTextEdit.Text = tagsText.ToString();
+
         
         _updatingUI = false;
     }

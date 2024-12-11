@@ -30,7 +30,7 @@ namespace ModDemo.Scripting
         {
             if (System.UInt64.TryParse(instanceId, out System.UInt64 id))
             {
-                if (_context.GetTree().GetRoot().GetNode(id.ToString()) is Node godotObject)
+                if (GodotObject.InstanceFromId(id) is Node godotObject)
                 {
                     godotObject.QueueFree();
                 }
@@ -46,7 +46,7 @@ namespace ModDemo.Scripting
         {
             if (System.UInt64.TryParse(instanceId, out System.UInt64 id))
             {
-                if (_context.GetTree().GetRoot().GetNode(id.ToString()) is Node3D godotObject)
+                if (GodotObject.InstanceFromId(id) is Node3D godotObject)
                 {
                     return new[]
                     {
