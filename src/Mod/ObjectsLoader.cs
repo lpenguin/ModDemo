@@ -307,11 +307,7 @@ public class ObjectsLoader
         }
         else
         {
-            boxShape.Size = new Vector3(
-                properties.Size.X,
-                properties.Size.Y,
-                properties.Size.Z
-            );
+            boxShape.Size = properties.Size.ToGodot();
         }
     
         collisionShape.Shape = boxShape;
@@ -325,15 +321,7 @@ public class ObjectsLoader
         }
         else
         {
-            // Apply transform from properties
-            if (properties.Transform.Position != null)
-                collisionShape.Position = properties.Transform.Position.ToGodot();
-         
-            if (properties.Transform.Rotation != null)
-                collisionShape.Rotation = properties.Transform.Rotation.ToGodot();
-         
-            if (properties.Transform.Scale != null)
-                collisionShape.Scale = properties.Transform.Scale.ToGodot();
+            collisionShape.Transform = properties.Transform.ToGodot();
         }
 
         return collisionShape;
@@ -374,6 +362,20 @@ public class ObjectsLoader
         var area3d = new Area3D();
         area3d.AddChild(collider);
         editorObject.AddChild(area3d);
+
+        // if (collider.Shape is BoxShape3D boxShape)
+        // {
+        //     MeshInstance3D colliderInstance = new MeshInstance3D();
+        //     colliderInstance.Transform = collider.Transform;
+        //     colliderInstance.Mesh = new BoxMesh()
+        //     {
+        //         Size = boxShape.Size
+        //     };
+        //     editorObject.AddChild(colliderInstance);
+        // }
+
         return editorObject;
     }
+
+
 }

@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://djdcdffppf4gr"]
+
+[ext_resource type="Shader" uid="uid://3cb4fp7kr75p" path="res://levelEditor/GridShader.gdshader" id="1_c4nty"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_c4nty")
+shader_parameter/grid_color = Color(0.2, 0.2, 0.2, 0.5)
+shader_parameter/grid_size = 1.0
+shader_parameter/line_thickness = 0.02

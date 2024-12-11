@@ -1,12 +1,9 @@
 ﻿using Godot;
 using System.Collections.Generic;
-using ModDemo.Json.Objects;
 using ModDemo.Json.Levels;
 using ModDemo.Json.Common;
 using ModDemo.Json.Common.Extensions;
 using ModDemo.Mod;
-using ModDemo.Nodes;
-using ModDemo.Util;
 using Vector3 = Godot.Vector3;
 
 namespace ModDemo.Editor;
@@ -14,7 +11,7 @@ namespace ModDemo.Editor;
 public partial class LevelEditor : Control
 {
     [Export(PropertyHint.Dir)]
-    public string modDirectory { get; set; } = "res://rootMod"; // Path to mod directory in project settings
+    public string modDirectory { get; set; } = "res://rootMod";
     
     private Mod.Mod _mod;
     private ItemList _objectsList;
@@ -24,9 +21,10 @@ public partial class LevelEditor : Control
     private LevelEditorObject? _selectedObject;
     private string? _selectedObjectId;
     private Level? _currentLevel;
-    private PackedScene _levelPickerScene;
-    private LevelPicker _levelPicker;
     private ObjectsLoader _objectsLoader;
+    private ObjectsController _objectsController;
+    private FileDialog _saveFileDialog;
+    private FileDialog _loadFileDialog;
 
     public override void _Ready()
     {
@@ -34,35 +32,54 @@ public partial class LevelEditor : Control
         _mod = new Mod.Mod(modDirectory);
         _objectsLoader = new ObjectsLoader(_mod);
 
-        _levelPickerScene = GD.Load<PackedScene>("res://levelEditor/level_picker.tscn");
-        _levelPicker = _levelPickerScene.Instantiate<LevelPicker>();
-        _levelPicker.Initialize(_mod);
-        _levelPicker.LevelSelected += OnLevelSelected;
-        AddChild(_levelPicker);
+        // Initialize save file dialog
+        _saveFileDialog = new FileDialog
+        {
+            Access = FileDialog.AccessEnum.Resources,
+            FileMode = FileDialog.FileModeEnum.SaveFile,
+            Filters = new[] { "*.json" },
+            Title = "Save Level",
+            RootSubfolder = _mod.LevelsDirectory,
+            CurrentDir = _mod.LevelsDirectory
+        };
+        _saveFileDialog.FileSelected += OnSaveFileSelected;
+        AddChild(_saveFileDialog);
+
+        _loadFileDialog = new FileDialog
+        {
+            Access = FileDialog.AccessEnum.Resources,
+            FileMode = FileDialog.FileModeEnum.OpenFile,
+            Filters = new[] { "*.json" },
+            Title = "Load Level",
+            RootSubfolder = _mod.LevelsDirectory,
+            CurrentDir = _mod.LevelsDirectory
+        };
+        _loadFileDialog.FileSelected += OnLoadFileSelected;
+        AddChild(_loadFileDialog);
 
         // Connect load button
-        GetNode<Button>("%LoadLevel").Pressed += () => _levelPicker.Show();
+        GetNode<Button>("%LoadLevel").Pressed += () => _loadFileDialog.Show();
 
         // Initialize UI elements
         _objectsList = GetNode<ItemList>("%ObjectsList");
         _viewport = GetNode<SubViewport>("%EditorViewport");
         
         // Setup 3D scene
-        _levelRoot = new Node3D();
+        _levelRoot = new Node3D { Name = "LevelRoot" };
         _viewport.AddChild(_levelRoot);
         _viewport.GuiEmbedSubwindows = true;
         _viewport.PhysicsObjectPicking = true;
-    
+        
         // Ensure SubViewportContainer stretches viewport properly
         var viewportContainer = GetNode<SubViewportContainer>("%ViewportContainer");
         viewportContainer.StretchShrink = 1;
-        viewportContainer.MouseFilter = MouseFilterEnum.Pass;
         
         // Add editor camera with controls
         _editorCamera = GetNode<Camera3D>("%EditorCamera");
         
-        // Add grid for reference
-        AddEditorGrid();
+        // Setup ObjectsController
+        _objectsController = GetNode<ObjectsController>("%ObjectsController");
+        _objectsController.ObjectSelected += OnObjectSelected;
         
         // Initialize objects browser
         InitializeObjectsBrowser();
@@ -72,24 +89,42 @@ public partial class LevelEditor : Control
         GetNode<Button>("%SaveLevel").Pressed += OnSaveLevel;
     }
 
-    private void OnLevelSelected(string levelName)
+    private void OnLoadFileSelected(string path)
     {
-        LoadLevel(levelName);
+        LoadLevel(path);
+    }
+
+    private void OnSaveFileSelected(string path)
+    {
+        try
+        {
+            // Extract level name from file path
+            _currentLevel.Id = System.IO.Path.GetFileNameWithoutExtension(path);
+            
+            // Save the level using mod's save functionality
+            _mod.SaveLevel(_currentLevel, path);
+            
+            // Show success message
+            GD.Print($"Level saved successfully to: {path}");
+        }
+        catch (System.Exception e)
+        {
+            GD.PrintErr($"Failed to save level: {e.Message}");
+        }
     }
 
     private void InitializeObjectsBrowser()
     {
-
         foreach (var (id, obj) in _mod.ObjectDefinitions)
         {
             _objectsList.AddItem(id);
         }
         
         // Connect signals
-        _objectsList.ItemSelected += OnObjectSelected;
+        _objectsList.ItemSelected += OnObjectBrowserSelected;
     }
 
-    private void LoadLevel(string levelName)
+    private void LoadLevel(string path)
     {
         // Clear existing level objects
         foreach (Node child in _levelRoot.GetChildren())
@@ -103,7 +138,7 @@ public partial class LevelEditor : Control
         // Load level data from JSON
         try
         {
-            _currentLevel = _mod.LoadLevel(levelName);
+            _currentLevel = _mod.LoadLevel(path);
         }
         catch (System.Exception e)
         {
@@ -127,130 +162,18 @@ public partial class LevelEditor : Control
                 }
 
                 _levelRoot.AddChild(editorObject);
-                    
-                // Add label with object name if specified
-                if (!string.IsNullOrEmpty(levelObject.Name))
-                {
-                    var label3D = new Label3D
-                    {
-                        Text = levelObject.Name,
-                        Position = editorObject.Position + Vector3.Up * 2,
-                        Scale = new Vector3(0.5f, 0.5f, 0.5f),
-                        Billboard = BaseMaterial3D.BillboardModeEnum.Enabled
-                    };
-                        
-                    _levelRoot.AddChild(label3D);
-                }
             }
         }
     }
 
-    private void OnObjectSelected(long index)
+    private void OnObjectBrowserSelected(long index)
     {
         _selectedObjectId = _objectsList.GetItemText((int)index);
     }
 
-    private void SelectObject(LevelEditorObject obj)
+    private void OnObjectSelected(LevelEditorObject? obj)
     {
         _selectedObject = obj;
-        // TODO: Add visual selection feedback
-    }
-
-    public override void _Input(InputEvent @event)
-    {
-        if (@event is InputEventMouseButton mouseButton)
-        {
-            if (mouseButton.ButtonIndex == MouseButton.Left && mouseButton.Pressed)
-            {
-                HandleLeftClick();
-            }
-            else if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed)
-            {
-                HandleRightClick(mouseButton);
-            }
-        }
-    }
-
-    private void HandleLeftClick()
-    {
-        if (_selectedObjectId == null || !_mod.ObjectDefinitions.ContainsKey(_selectedObjectId)) return;
-
-        // Cast ray from camera to find placement position
-        var mousePos = GetViewport().GetMousePosition();
-        var rayOrigin = _editorCamera.ProjectRayOrigin(mousePos);
-        var rayEnd = rayOrigin + _editorCamera.ProjectRayNormal(mousePos) * 1000;
-        
-        var spaceState = _viewport.World3D.DirectSpaceState;
-        var query = PhysicsRayQueryParameters3D.Create(rayOrigin, rayEnd);
-        query.CollideWithAreas = true;
-        var result = spaceState.IntersectRay(query);
-        
-        if (result.Count > 0)
-        {
-            var hitPosition = (Vector3)result["position"];
-            PlaceObject(_selectedObjectId, hitPosition);
-        }
-    }
-
-    private void HandleRightClick(InputEventMouseButton mouseButton)
-    {
-        var mousePos = GetViewport().GetMousePosition();
-        var rayOrigin = _editorCamera.ProjectRayOrigin(mousePos);
-        var rayEnd = rayOrigin + _editorCamera.ProjectRayNormal(mousePos) * 1000;
-        
-        var spaceState = _viewport.World3D.DirectSpaceState;
-        var query = PhysicsRayQueryParameters3D.Create(rayOrigin, rayEnd);
-        query.CollideWithAreas = true;
-        var result = spaceState.IntersectRay(query);
-        
-        if (result.Count > 0 && result.ContainsKey("collider"))
-        {
-            var hitObject = result["collider"].As<Node3D>();
-            if (hitObject.GetParent() is LevelEditorObject editorObject)
-            {
-                SelectObject(editorObject);
-            }
-        }
-        else
-        {
-            SelectObject(null);
-        }
-    }
-    
-    private void PlaceObject(string objectId, Vector3 position)
-    {
-        if (_mod.ObjectDefinitions.TryGetValue(objectId, out var definition))
-        {
-            var editorObject = _objectsLoader.LoadLevelEditorObject(definition);
-            editorObject.Position = position;
-            _levelRoot.AddChild(editorObject);
-        }
-    }
-    
-    private void AddEditorGrid()
-    {
-        var planeMesh = new PlaneMesh
-        {
-            Size = new Vector2(20, 20), // 20x20 units
-            SubdivideWidth = 20,
-            SubdivideDepth = 20
-        };
-        
-        var gridMeshInstance = new MeshInstance3D
-        {
-            Mesh = planeMesh
-        };
-        
-        // Create grid material
-        var material = new StandardMaterial3D
-        {
-            Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
-            AlbedoColor = new Godot.Color(0.3f, 0.3f, 0.3f, 0.5f),
-            ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded
-        };
-        
-        gridMeshInstance.MaterialOverride = material;
-        _levelRoot.AddChild(gridMeshInstance);
     }
 
     private void OnNewLevel()
@@ -311,7 +234,33 @@ public partial class LevelEditor : Control
             }
         }
 
-        // Save level to file
-        // TODO: Implement save dialog and file writing
+        _saveFileDialog.Show();
+    }
+    
+    private void DuplicateSelectedObject()
+    {
+        if (_selectedObject == null || _currentLevel == null) return;
+
+        if (_mod.ObjectDefinitions.TryGetValue(_selectedObject.ObjectId, out var definition))
+        {
+            var duplicatedObject = _objectsLoader.LoadLevelEditorObject(definition);
+        
+            var offset = new Vector3(1, 0, 1);
+            duplicatedObject.Transform = _selectedObject.Transform;
+            duplicatedObject.Position += offset;
+        
+            _levelRoot.AddChild(duplicatedObject);
+        
+            _objectsController.SetSelectedObject(duplicatedObject);
+        }
+    }
+    
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        if (@event is InputEventKey keyEvent && keyEvent is { Pressed: true, CtrlPressed: true, Keycode: Key.D })
+        {
+            DuplicateSelectedObject();
+            GetViewport().SetInputAsHandled();
+        }
     }
 }

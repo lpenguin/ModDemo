@@ -11,4 +11,11 @@ public static class GodotFile
         file.Close();
         return content;
     }
+
+    public static void WriteAllText(string path, string content)
+    {
+        var file = FileAccess.Open(path, FileAccess.ModeFlags.Write);
+        file.StoreString(content);
+        file.Close();
+    }
 }

@@ -34,12 +34,12 @@ public static class LevelReader
         }
     }
 
-    public static void SaveToFile(this Level level, string filePath)
+    public static void SaveToFile(Level level, string filePath)
     {
         try
         {
             string jsonContent = JsonSerializer.Serialize(level, Options);
-            File.WriteAllText(filePath, jsonContent);
+            GodotFile.WriteAllText(filePath, jsonContent);
         }
         catch (Exception ex) when (ex is JsonException or IOException)
         {
