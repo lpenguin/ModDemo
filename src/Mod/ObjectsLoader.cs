@@ -338,12 +338,22 @@ public class ObjectsLoader
         };
 
         var editorObject = new LevelEditorObject(definition.Id);
-        if (meshProperties == null)
-        {
-            return editorObject;
-        }
 
-        var visualInstance = LoadMesh(meshProperties);  
+        var visualInstance = meshProperties switch
+        {
+            null => new MeshInstance3D
+            {
+                Mesh = new BoxMesh
+                {
+                    Size = Vector3.One
+                },
+                MaterialOverride = new StandardMaterial3D
+                {
+                    AlbedoColor = Colors.Pink,
+                }
+            },
+            _ => LoadMesh(meshProperties)
+        };  
         editorObject.AddChild(visualInstance);
         PhysicsProperties? physicsProperties = definition switch
         {
@@ -353,26 +363,20 @@ public class ObjectsLoader
             _ => null
         };
 
-        if (physicsProperties == null)
+        var collider = physicsProperties switch
         {
-            return editorObject;
-        }
-
-        var collider = CreateCollisionShape(physicsProperties, visualInstance);
+            null => new CollisionShape3D()
+            {
+                Shape = new BoxShape3D
+                {
+                    Size = Vector3.One
+                }
+            },
+            _ => CreateCollisionShape(physicsProperties, visualInstance)
+        };
         var area3d = new Area3D();
         area3d.AddChild(collider);
         editorObject.AddChild(area3d);
-
-        // if (collider.Shape is BoxShape3D boxShape)
-        // {
-        //     MeshInstance3D colliderInstance = new MeshInstance3D();
-        //     colliderInstance.Transform = collider.Transform;
-        //     colliderInstance.Mesh = new BoxMesh()
-        //     {
-        //         Size = boxShape.Size
-        //     };
-        //     editorObject.AddChild(colliderInstance);
-        // }
 
         return editorObject;
     }

@@ -1,14 +1,19 @@
-[gd_scene load_steps=6 format=3 uid="uid://bqxic1nptd5jl"]
+[gd_scene load_steps=9 format=3 uid="uid://bqxic1nptd5jl"]
 
 [ext_resource type="Script" uid="uid://cfriu0egdk2j6" path="res://src/Editor/LevelEditor.cs" id="1_pww3k"]
+[ext_resource type="Environment" uid="uid://beuk7mlqnudc0" path="res://levelEditor/environment.tres" id="2_20y6c"]
 [ext_resource type="Script" uid="uid://cxwt33vwksrc0" path="res://src/Nodes/CameraControls.cs" id="2_pww3k"]
-
-[sub_resource type="Environment" id="Environment_pww3k"]
+[ext_resource type="Script" path="res://src/Editor/PropertiesController.cs" id="2_yia8m"]
+[ext_resource type="Script" path="res://src/Editor/ObjectsController.cs" id="3_sq8so"]
+[ext_resource type="Material" uid="uid://djdcdffppf4gr" path="res://levelEditor/grid_shader_material.tres" id="4_sifeq"]
 
 [sub_resource type="World3D" id="World3D_20y6c"]
-environment = SubResource("Environment_pww3k")
+environment = ExtResource("2_20y6c")
 
-[sub_resource type="BoxMesh" id="BoxMesh_yrsov"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_20y6c"]
+size = Vector2(90, 90)
+subdivide_width = 20
+subdivide_depth = 20
 
 [node name="LevelEditor" type="Control"]
 layout_mode = 3
@@ -47,18 +52,37 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Load Level"
 
+[node name="HSplitContainer" type="HSplitContainer" parent="HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+split_offset = 100
+
+[node name="Label Name" type="Label" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Level Name"
+
+[node name="LevelNameEdit" type="LineEdit" parent="HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
 [node name="HSplitContainer" type="HSplitContainer" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
-split_offset = -875
+split_offset = -335
 
-[node name="Objects Browser" type="Panel" parent="HBoxContainer/HSplitContainer"]
+[node name="VSplitContainer" type="VSplitContainer" parent="HBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Objects Browser" type="Panel" parent="HBoxContainer/HSplitContainer/VSplitContainer"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
-size_flags_horizontal = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/HSplitContainer/Objects Browser"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/HSplitContainer/VSplitContainer/Objects Browser"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -66,41 +90,166 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/HSplitContainer/Objects Browser/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/HSplitContainer/VSplitContainer/Objects Browser/VBoxContainer"]
 layout_mode = 2
-text = "Objects"
+text = "Objects Collection"
 
-[node name="ObjectsList" type="ItemList" parent="HBoxContainer/HSplitContainer/Objects Browser/VBoxContainer"]
+[node name="ObjectsList" type="ItemList" parent="HBoxContainer/HSplitContainer/VSplitContainer/Objects Browser/VBoxContainer"]
 unique_name_in_owner = true
 clip_contents = false
 layout_mode = 2
 size_flags_vertical = 3
-item_count = 2
-item_0/text = "aaas"
-item_1/text = "asadasd"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/HSplitContainer/VSplitContainer/Objects Browser/VBoxContainer"]
+layout_mode = 2
+
+[node name="AddButton" type="Button" parent="HBoxContainer/HSplitContainer/VSplitContainer/Objects Browser/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Add"
+
+[node name="DuplicateButton" type="Button" parent="HBoxContainer/HSplitContainer/VSplitContainer/Objects Browser/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Duplicate"
+
+[node name="VSeparator" type="VSeparator" parent="HBoxContainer/HSplitContainer/VSplitContainer/Objects Browser/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DeleteButton" type="Button" parent="HBoxContainer/HSplitContainer/VSplitContainer/Objects Browser/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Delete"
+
+[node name="PropertiesController" type="Panel" parent="HBoxContainer/HSplitContainer/VSplitContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_yia8m")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer2" type="GridContainer" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="Id Label" type="Label" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer2"]
+layout_mode = 2
+text = "Id"
+
+[node name="IdEdit" type="LineEdit" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="Name Label" type="Label" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer2"]
+layout_mode = 2
+text = "Name"
+
+[node name="NameEdit" type="LineEdit" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer"]
+layout_mode = 2
+text = "Position"
+
+[node name="GridContainer" type="GridContainer" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer"]
+layout_mode = 2
+columns = 3
+
+[node name="X Label4" type="Label" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "X"
+
+[node name="Y Label5" type="Label" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Y"
+
+[node name="Z Label6" type="Label" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Z"
+
+[node name="XLineEdit" type="LineEdit" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="YLineEdit" type="LineEdit" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ZLineEdit" type="LineEdit" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Rotation"
+
+[node name="GridContainer3" type="GridContainer" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+columns = 3
+
+[node name="X Label4" type="Label" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer3"]
+layout_mode = 2
+text = "X"
+
+[node name="Y Label5" type="Label" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer3"]
+layout_mode = 2
+text = "Y"
+
+[node name="Z Label6" type="Label" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer3"]
+layout_mode = 2
+text = "Z"
+
+[node name="RXLineEdit" type="LineEdit" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="RYLineEdit" type="LineEdit" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="RZLineEdit" type="LineEdit" parent="HBoxContainer/HSplitContainer/VSplitContainer/PropertiesController/VBoxContainer/GridContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
 
 [node name="ViewportContainer" type="SubViewportContainer" parent="HBoxContainer/HSplitContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-mouse_filter = 2
 stretch = true
 
 [node name="EditorViewport" type="SubViewport" parent="HBoxContainer/HSplitContainer/ViewportContainer"]
 unique_name_in_owner = true
 world_3d = SubResource("World3D_20y6c")
 handle_input_locally = false
-physics_object_picking = true
-size = Vector2i(1020, 613)
+size = Vector2i(905, 613)
 render_target_update_mode = 4
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="HBoxContainer/HSplitContainer/ViewportContainer/EditorViewport"]
-mesh = SubResource("BoxMesh_yrsov")
+[node name="ObjectsController" type="Node" parent="HBoxContainer/HSplitContainer/ViewportContainer/EditorViewport"]
+unique_name_in_owner = true
+script = ExtResource("3_sq8so")
 
 [node name="EditorCamera" type="Camera3D" parent="HBoxContainer/HSplitContainer/ViewportContainer/EditorViewport"]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15.636)
 script = ExtResource("2_pww3k")
+MaxZoom = 100.0
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="HBoxContainer/HSplitContainer/ViewportContainer/EditorViewport"]
 transform = Transform3D(1, 0, 0, 0, 0.69121, 0.722654, 0, -0.722654, 0.69121, 0, 4.8371, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="HBoxContainer/HSplitContainer/ViewportContainer/EditorViewport"]
+material_override = ExtResource("4_sifeq")
+mesh = SubResource("PlaneMesh_20y6c")

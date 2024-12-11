@@ -11,6 +11,9 @@ public partial class ObjectsController : Node
     
     [Signal]
     public delegate void ObjectSelectedEventHandler(LevelEditorObject? selectedObject);
+    
+    [Signal]
+    public delegate void ObjectTransformedEventHandler(LevelEditorObject selectedObject);
 
     public override void _Ready()
     {
@@ -22,6 +25,10 @@ public partial class ObjectsController : Node
         _gizmoTool = new GizmoTool();
         AddChild(_gizmoTool);
         _gizmoTool.SetCamera(_editorCamera);
+        _gizmoTool.ObjectTransformed += selectedObject =>
+        {
+            EmitSignal(SignalName.ObjectTransformed, selectedObject);
+        };
     }
 
     private LevelEditorObject? GetObjectUnderMouse(Vector2 mousePos)

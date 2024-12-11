@@ -4,6 +4,9 @@ namespace ModDemo.Editor;
 
 public partial class GizmoTool : Node3D
 {
+    [Signal]
+    public delegate void ObjectTransformedEventHandler(LevelEditorObject selectedObject);
+
     // Colors for axes and planes
     private static readonly Color XAxisColor = new(1, 0, 0); // Red
     private static readonly Color YAxisColor = new(0, 1, 0); // Green
@@ -300,6 +303,7 @@ public partial class GizmoTool : Node3D
         }
         
         _selectedObject.GlobalPosition = _objectStartPosition + delta;
+        EmitSignal(SignalName.ObjectTransformed, _selectedObject);
         GlobalPosition = _selectedObject.GlobalPosition;
     }
     

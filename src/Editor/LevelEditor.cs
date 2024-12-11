@@ -25,9 +25,12 @@ public partial class LevelEditor : Control
     private ObjectsController _objectsController;
     private FileDialog _saveFileDialog;
     private FileDialog _loadFileDialog;
+    private PropertiesController _propertiesController;
+    private LineEdit _levelNameEdit;
 
     public override void _Ready()
     {
+
         // Get mod directory from export variable
         _mod = new Mod.Mod(modDirectory);
         _objectsLoader = new ObjectsLoader(_mod);
@@ -80,13 +83,47 @@ public partial class LevelEditor : Control
         // Setup ObjectsController
         _objectsController = GetNode<ObjectsController>("%ObjectsController");
         _objectsController.ObjectSelected += OnObjectSelected;
+        _objectsController.ObjectTransformed += OnObjectTransformed;
         
+        _propertiesController = GetNode<PropertiesController>("%PropertiesController");
+
+        _levelNameEdit = GetNode<LineEdit>("%LevelNameEdit");
+        _levelNameEdit.TextChanged += OnLevelNameChanged;
+
         // Initialize objects browser
         InitializeObjectsBrowser();
             
         // Connect UI signals
         GetNode<Button>("%NewLevel").Pressed += OnNewLevel;
         GetNode<Button>("%SaveLevel").Pressed += OnSaveLevel;
+        GetNode<Button>("%AddButton").Pressed += AddObject;
+        GetNode<Button>("%DeleteButton").Pressed += DeleteSelectedObject;
+        GetNode<Button>("%DuplicateButton").Pressed += DuplicateSelectedObject;
+        
+        _currentLevel = new Level()
+        {
+            Id = "new_level",
+            Name = "New Level",
+            Objects = new List<LevelObject>(),
+        };
+        UpdateLevelNameUI();
+    }
+
+    private void OnLevelNameChanged(string newName)
+    {
+        if (_currentLevel != null)
+        {
+            _currentLevel.Name = newName;
+        }
+    }
+    private void UpdateLevelNameUI()
+    {
+        _levelNameEdit.Text = _currentLevel?.Name ?? "";
+    }
+
+    private void OnObjectTransformed(LevelEditorObject selectedobject)
+    {
+        _propertiesController.Update();
     }
 
     private void OnLoadFileSelected(string path)
@@ -139,6 +176,7 @@ public partial class LevelEditor : Control
         try
         {
             _currentLevel = _mod.LoadLevel(path);
+            UpdateLevelNameUI();
         }
         catch (System.Exception e)
         {
@@ -174,6 +212,7 @@ public partial class LevelEditor : Control
     private void OnObjectSelected(LevelEditorObject? obj)
     {
         _selectedObject = obj;
+        _propertiesController.SetSelectedObject(obj);
     }
 
     private void OnNewLevel()
@@ -193,6 +232,8 @@ public partial class LevelEditor : Control
             Name = "New Level",
             Objects = new List<LevelObject>()
         };
+        
+        UpdateLevelNameUI();
     }
 
     private void OnSaveLevel()
@@ -237,6 +278,30 @@ public partial class LevelEditor : Control
         _saveFileDialog.Show();
     }
     
+    
+    private void AddObject()
+    {
+        if (_selectedObjectId != null)
+        {
+            if (_mod.ObjectDefinitions.TryGetValue(_selectedObjectId, out var definition))
+            {
+                var newObject = _objectsLoader.LoadLevelEditorObject(definition);
+                _levelRoot.AddChild(newObject);
+                _objectsController.SetSelectedObject(newObject);
+            }
+        }
+    }
+    
+    private void DeleteSelectedObject()
+    {
+        if (_selectedObject == null || _currentLevel == null) return;
+
+        _selectedObject.QueueFree();
+        _levelRoot.RemoveChild(_selectedObject);
+        _objectsController.SetSelectedObject(null);
+        _selectedObject = null;
+    }
+
     private void DuplicateSelectedObject()
     {
         if (_selectedObject == null || _currentLevel == null) return;
@@ -257,9 +322,15 @@ public partial class LevelEditor : Control
     
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (@event is InputEventKey keyEvent && keyEvent is { Pressed: true, CtrlPressed: true, Keycode: Key.D })
+        if (@event is InputEventKey { Pressed: true, CtrlPressed: true, Keycode: Key.D })
         {
             DuplicateSelectedObject();
+            GetViewport().SetInputAsHandled();
+        }
+        
+        if (@event is InputEventKey { Pressed: true, Keycode: Key.Delete })
+        {
+            DeleteSelectedObject();
             GetViewport().SetInputAsHandled();
         }
     }
