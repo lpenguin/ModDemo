@@ -22,8 +22,8 @@ public partial class KeyValuesStorage : Node
         _keyValues[key] = value;
     }
 
-    public object Get(string key)
+    public object? Get(string key, object? def)
     {
-        return _keyValues[key];
+        return _keyValues!.GetValueOrDefault(key, def);
     }
 }

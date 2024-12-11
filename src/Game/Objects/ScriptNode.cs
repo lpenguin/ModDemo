@@ -1,109 +1,33 @@
 ﻿using Godot;
 using ModDemo.Nodes;
-using ModDemo.Util;
-using MoonSharp.Interpreter;
-using Script = MoonSharp.Interpreter.Script;
+using ModDemo.Scripting;
 
-namespace ModDemo.Game.Objects;
-
-public partial class ScriptNode : Node, IDamageHandler
+namespace ModDemo.Game.Objects
 {
-    [Export]
-    public string Script { get; set; }
-
-    private Script? _script;
-    private Closure? _damageHandler;
-    private Closure? _updateHandler;
-
-    public override void _Ready()
+    public partial class ScriptNode : Node, IDamageHandler
     {
-        _script = new Script
-        {
-            Globals =
-            {
-                ["DebugPrint"] = (string message) => GD.Print(message),
-                ["GetScriptParent"] = () => GetScriptParent(),
-                ["DestroyObject"] = (string id) => DestroyObject(id),
-                ["GetObjectPosition"] = (string id) => GetObjectPosition(id),
-                ["ShowMessage"] = (string message) => ModUi.Instance.AddMessage(message),
-                ["SetValue"] = (string key, object value) => KeyValuesStorage.Instance.Set(key, value),
-                ["GetValue"] = (string key) => KeyValuesStorage.Instance.Get(key),
-                ["PlayEffect"] = (string effect, float[] position) => PlayEffect(effect, position),
-            }
-        };
-        _script.DoString(Script);
+        [Export]
+        public string Script { get; set; }
 
-        GetClosure("Ready")?.Call();
-        _damageHandler = GetClosure("OnDamage");
-        _updateHandler = GetClosure("Update");
-    }
+        private LuaScript? _luaScript;
+        private LuaGlobals? _luaGlobals;
+        private readonly GameServices _services = new();
 
-    private void PlayEffect(string effect, float[] position)
-    {
-        if (position.Length != 3)
+        public override void _Ready()
         {
-            GD.Print("PlayEffect: Invalid position");
-            return;
+            _luaGlobals = new LuaGlobals(this, _services);
+            _luaScript = new LuaScript(Script, _luaGlobals);
+            _luaScript.Initialize();
         }
-        EffectManager.Instance.PlayEffect(effect, new Vector3(position[0], position[1], position[2]));
-    }
 
-    public override void _Process(double delta)
-    {
-        _updateHandler?.Call(delta);
-    }
+        public override void _Process(double delta)
+        {
+            _luaScript?.Update(delta);
+        }
 
-    private Closure? GetClosure(string name)
-    {
-        if (_script?.Globals[name] is Closure closure)
+        public void ApplyDamage(float damage)
         {
-            return closure;
+            _luaScript?.HandleDamage(damage);
         }
-        return null;
-    }
-
-    private string GetScriptParent()
-    {
-        return GetParent().GetInstanceId().ToString();
-    }
-
-    private float[] GetObjectPosition(string instanceId)
-    {
-        if (System.UInt64.TryParse(instanceId, out System.UInt64 id))
-        {
-            if (InstanceFromId(id) is Node3D godotObject)
-            {
-                return new[]
-                {
-                    godotObject.Position.X,
-                    godotObject.Position.Y,
-                    godotObject.Position.Z
-                };
-            }
-        }
-        else
-        {
-            GD.PrintErr($"Invalid instance id: {instanceId}");
-        }
-        return new float[] { 0, 0, 0 };
-    }
-
-    private void DestroyObject(string instanceId)
-    {
-        if (System.UInt64.TryParse(instanceId, out System.UInt64 id))
-        {
-            if (InstanceFromId(id) is Node godotObject)
-            {
-                godotObject.QueueFree();
-            }
-        }
-        else
-        {
-            GD.PrintErr($"Invalid instance id: {instanceId}");
-        }
-    }
-    public void ApplyDamage(float damage)
-    {
-        _damageHandler?.Call(damage);
     }
 }

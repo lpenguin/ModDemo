@@ -40,8 +40,7 @@ public partial class VehicleObject : VehicleBody3D
 
     public override void _PhysicsProcess(double delta)
     {
-        GD.Print(LinearVelocity.Length());
-         if (!ControlledByPlayer) return;
+        if (!ControlledByPlayer) return;
         
         bool isNearlyStopped = LinearVelocity.Length() < VELOCITY_THRESHOLD;
 
